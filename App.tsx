@@ -2,6 +2,7 @@ import React from 'react';
 import * as eva from '@eva-design/eva';
 import { ApplicationProvider, IconRegistry, Layout, Text, Button, Icon } from '@ui-kitten/components';
 import { EvaIconsPack } from '@ui-kitten/eva-icons';
+import { AppNavigator } from './src/components/navigation.component';
 
 const FacebookIcon = (props: any) => (
   <Icon name='facebook' {...props} />
@@ -23,7 +24,7 @@ const App = () => {
     <>
       <IconRegistry icons={EvaIconsPack} />
       <ApplicationProvider {...eva} theme={eva.light}>
-        <HomeScreen />
+        <AppNavigator />
       </ApplicationProvider>
     </>
   );
