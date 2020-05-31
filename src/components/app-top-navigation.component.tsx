@@ -14,14 +14,13 @@ export class AppTopNavigation extends Component {
         this.props = props;
     }
 
-    private BackIcon = (props: any) => <Icon {...props} name='arrow-back' />;
-    private MenuIcon = (props: any) => <Icon {...props} name='menu' />;
-
-    private BackAction = (props: any) => <TopNavigationAction {...props} icon={this.BackIcon}
+    private BackAction = (props: any) => <TopNavigationAction {...props}
+        icon={(props: any) => <Icon {...props} name='arrow-back' />}
         onPress={() => { this.props.navigation.goBack(); }} />;
 
-    private MenuAction = (props: any) => <TopNavigationAction {...props} icon={this.MenuIcon}
-        onPress={() => { console.log('TODO: menu action need to be handled') }} />;
+    private MenuAction = (props: any) => <TopNavigationAction {...props}
+        icon={(props: any) => <Icon {...props} name='menu' />}
+        onPress={() => { this.props.navigation.openDrawer() }} />;
 
     render() {
         if (this.props.leftAccessory === "back") {
