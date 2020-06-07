@@ -15,12 +15,13 @@ export class Book extends BaseEntity {
     @UpdateDateColumn() public updatedDate: Date;
     @ManyToMany(type => Label, label => label.books) @JoinTable() public labels: Label[];
 
-    constructor(id: number, title: string, authors: string, quantity: number, description?: string, remark?: string) {
+    constructor(id?: number, title?: string, authors?: string, quantity?: number, description?: string,
+        remark?: string) {
         super();
-        this.id = id;
-        this.title = title;
-        this.authors = authors;
-        this.quantity = quantity;
+        this.id = id || 0;
+        this.title = title || "";
+        this.authors = authors || "";
+        this.quantity = quantity || 0;
         this.description = description;
         this.remark = remark;
         this.createdDate = new Date();
