@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import { createStackNavigator } from '@react-navigation/stack';
-import { BookListScreen } from './book-list-screen.component';
-import { BookAddScreen } from './book-add-screen.component';
+import { Text, Button } from 'react-native';
 
 declare type DrawerNavigationProperties = {
     navigation: {
@@ -16,7 +14,11 @@ declare type DrawerNavigationProperties = {
         jumpTo: Function,
         navigate: Function,
         openDrawer: Function,
+        pop: Function,
+        popToTop: Function,
+        push: Function,
         removeListener: Function,
+        replace: Function,
         reset: Function,
         setOptions: Function,
         setParams: Function,
@@ -29,15 +31,20 @@ declare type DrawerNavigationProperties = {
     }
 }
 
-const Stack = createStackNavigator();
+export class BookListScreen extends Component<DrawerNavigationProperties> {
+    constructor(props: DrawerNavigationProperties) {
+        super(props);
+    }
 
-export class BookScreen extends Component<DrawerNavigationProperties> {
     render() {
         return (
-            <Stack.Navigator initialRouteName="book.list" headerMode="screen">
-                <Stack.Screen name="book.list" component={BookListScreen} options={{ title: "Book list" }} />
-                <Stack.Screen name="book.add" component={BookAddScreen} options={{ title: "Add new book" }} />
-            </Stack.Navigator>
+            <>
+                <Text>This is LIST of BOOKS screen</Text>
+                <Button
+                    title="Add book"
+                    onPress={() => { this.props.navigation.navigate("book.add"); }}
+                />
+            </>
         );
     }
 }

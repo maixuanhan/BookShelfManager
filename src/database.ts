@@ -21,7 +21,5 @@ export class Database {
             synchronize: true,
             entities: [Book, Label]
         });
-        // Book.useConnection(connection);
-        // Label.useConnection(connection);
     }
 }
