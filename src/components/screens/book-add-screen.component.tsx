@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
 import { Text, Button, StyleSheet, TextInput, View } from 'react-native';
+import { Book } from '../../models/book';
+import { BookService } from '../../services/book-service';
+import { IDbReadyProperty } from '../../reducers/dbready';
+import { connect } from 'react-redux';
 
-declare type DrawerNavigationProperties = {
+interface IDrawerNavigationProperties {
     navigation: {
         addListener: Function,
         canGoBack: Function,
@@ -31,10 +35,16 @@ declare type DrawerNavigationProperties = {
     }
 }
 
-export class BookAddScreen extends Component<DrawerNavigationProperties> {
-    constructor(props: DrawerNavigationProperties) {
+interface IBookAddScreenProps extends IDbReadyProperty, IDrawerNavigationProperties {
+}
+
+export class _BookAddScreen extends Component<IBookAddScreenProps> {
+    constructor(props: IBookAddScreenProps) {
         super(props);
     }
+
+    private book = new Book();
+    private bookService = new BookService();
 
     private styles = StyleSheet.create({
         view: {
@@ -76,30 +86,53 @@ export class BookAddScreen extends Component<DrawerNavigationProperties> {
         }
     });
 
+    private async addBook() {
+        if (this.props.dbReady) {
+            try {
+                await this.bookService.addBook(this.book);
+            } catch (e) {
+                console.log("Something went wrong while adding book.", e);
+            }
+            this.props.navigation.navigate("book.list");
+        } else {
+            console.log("Database is not ready");
+        }
+    }
+
     render() {
         return (
             <>
                 <View style={this.styles.view}>
                     <View style={this.styles.inputView}>
                         <Text style={this.styles.labelForm}>Title</Text>
-                        <TextInput style={this.styles.inputForm} onChangeText={text => { console.log(text); }} />
+                        <TextInput style={this.styles.inputForm} onChangeText={text => {
+                            this.book.title = text;
+                        }} />
                         <Text style={this.styles.labelForm}>Authors</Text>
-                        <TextInput style={this.styles.inputForm} onChangeText={text => { console.log(text); }} />
+                        <TextInput style={this.styles.inputForm} onChangeText={text => {
+                            this.book.authors = text;
+                        }} />
                         <Text style={this.styles.labelForm}>Quantity</Text>
-                        <TextInput style={this.styles.inputForm} onChangeText={text => { console.log(text); }} />
+                        <TextInput style={this.styles.inputForm} onChangeText={text => {
+                            this.book.quantity = parseInt(text);
+                        }} />
                         <Text style={this.styles.labelForm}>Description</Text>
-                        <TextInput style={this.styles.inputForm} onChangeText={text => { console.log(text); }} />
+                        <TextInput style={this.styles.inputForm} onChangeText={text => {
+                            this.book.description = text;
+                        }} />
                         <Text style={this.styles.labelForm}>Remark</Text>
-                        <TextInput style={this.styles.inputForm} onChangeText={text => { console.log(text); }} />
+                        <TextInput style={this.styles.inputForm} onChangeText={text => {
+                            this.book.remark = text;
+                        }} />
                     </View>
                     <View style={this.styles.buttonView}>
                         <View style={this.styles.wrapButtonView}>
                             <Button color={this.styles.saveButton.backgroundColor} title="Save"
-                                onPress={() => { console.log("Save pressed!"); }} />
+                                onPress={() => { this.addBook(); }} />
                         </View>
                         <View style={this.styles.wrapButtonView}>
                             <Button color={this.styles.cancelButton.backgroundColor} title="Cancel"
-                                onPress={() => { console.log("Cancel pressed!"); }} />
+                                onPress={() => { this.props.navigation.navigate("book.list"); }} />
                         </View>
                     </View>
                 </View>
@@ -107,3 +140,6 @@ export class BookAddScreen extends Component<DrawerNavigationProperties> {
         );
     }
 }
+
+const mapStateToProps = ({ dbReady }) => ({ dbReady });
+export const BookAddScreen = connect(mapStateToProps)(_BookAddScreen);

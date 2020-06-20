@@ -1,4 +1,4 @@
-import { Label } from "src/models/label";
+import { Label } from "../models/label";
 
 export class LabelService {
     public async getLabels(skip: number, take: number): Promise<[Label[], number]> {
@@ -6,7 +6,7 @@ export class LabelService {
     }
 
     public async addLabel(name: string, description?: string): Promise<Label> {
-        const label = new Label(0, name, description);
+        const label = new Label(undefined, name, description);
         return label.save();
     }
 

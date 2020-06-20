@@ -1,16 +1,19 @@
-import { Book } from "src/models/book";
-import { Label } from "src/models/label";
+import { Book } from "../models/book";
+import { Label } from "../models/label";
 
 export class BookService {
     public async getBooks(skip: number, take: number): Promise<[Book[], number]> {
         return Book.findAndCount({ relations: ["labels"], skip, take });
     }
 
-    public async addBook(title: string, authors: string, quantity: number,
-        description?: string, remark?: string, labelIds?: number[]): Promise<Book> {
-        const book = new Book(0, title, authors, quantity, description, remark);
-        if (labelIds && labelIds.length > 0) {
-            const labels = await Label.findByIds(labelIds);
+    public async addBook(info: Partial<Book>, labels?: Label[]): Promise<Book> {
+        const book = new Book(undefined, info.title, info.authors, info.quantity, info.description, info.remark);
+        if (labels) {
+            for (const label of labels) {
+                if (!label.id) {
+                    await label.save();
+                }
+            }
             book.labels = labels;
         }
         return book.save();
