@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { Text, Button } from 'react-native';
+import { Text, Button, FlatList } from 'react-native';
 import { BookService } from '../../services/book-service';
-import { ScrollView } from 'react-native-gesture-handler';
 import { connect } from 'react-redux';
 import { IDbReadyProperty } from '../../reducers/dbready';
+import { Book } from 'src/models/book';
 
 interface IDrawerNavigationProperties {
     navigation: {
@@ -38,7 +38,11 @@ interface IDrawerNavigationProperties {
 interface IBookListScreenProps extends IDbReadyProperty, IDrawerNavigationProperties {
 }
 
-class _BookListScreen extends Component<IBookListScreenProps> {
+interface IBookListScreenStates {
+    books: Book[];
+}
+
+class _BookListScreen extends Component<IBookListScreenProps, IBookListScreenStates> {
     constructor(props: IBookListScreenProps) {
         super(props);
         this.state = {
@@ -50,12 +54,14 @@ class _BookListScreen extends Component<IBookListScreenProps> {
 
     private async tryLoadBooks() {
         if (this.props.dbReady) {
+            let books: Book[] = [];
             try {
-                const [books, count] = await this.bookService.getBooks(0, 100);
-                this.setState({ ...this.state, books });
+                const [bs, count] = await this.bookService.getBooks(0, 100);
+                books = bs;
             } catch (e) {
                 console.log("Error happens while fetching books.", e);
             }
+            this.setState({ ...this.state, books });
         }
     }
 
@@ -79,15 +85,15 @@ class _BookListScreen extends Component<IBookListScreenProps> {
                         this.props.navigation.navigate("book.add");
                     }}
                 />
-                <ScrollView>
-                    {this.state.books.map((b) => (
-                        <Text key={b.id}>{b.title}</Text>
-                    ))}
-                </ScrollView>
+                <FlatList
+                    data={this.state.books}
+                    renderItem={({ item }) => <Text>{item.title}</Text>}
+                    keyExtractor={item => item.id.toString()}
+                />
             </>
         );
     }
 }
 
-const mapStateToProps = ({ dbReady }) => ({ dbReady });
+const mapStateToProps = (obj: IDbReadyProperty) => ({ dbReady: obj.dbReady });
 export const BookListScreen = connect(mapStateToProps)(_BookListScreen);

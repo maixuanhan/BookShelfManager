@@ -4,6 +4,7 @@ import { Book } from '../../models/book';
 import { BookService } from '../../services/book-service';
 import { IDbReadyProperty } from '../../reducers/dbready';
 import { connect } from 'react-redux';
+import { searchTitle } from '../../services/goodreads';
 
 interface IDrawerNavigationProperties {
     navigation: {
@@ -99,15 +100,20 @@ export class _BookAddScreen extends Component<IBookAddScreenProps> {
         }
     }
 
+    private onTitleChanged(text: string) {
+        this.book.title = text;
+        if (text.length >= 3) {
+            searchTitle(text);
+        }
+    }
+
     render() {
         return (
             <>
                 <View style={this.styles.view}>
                     <View style={this.styles.inputView}>
                         <Text style={this.styles.labelForm}>Title</Text>
-                        <TextInput style={this.styles.inputForm} onChangeText={text => {
-                            this.book.title = text;
-                        }} />
+                        <TextInput style={this.styles.inputForm} onChangeText={(text) => this.onTitleChanged(text)} />
                         <Text style={this.styles.labelForm}>Authors</Text>
                         <TextInput style={this.styles.inputForm} onChangeText={text => {
                             this.book.authors = text;
