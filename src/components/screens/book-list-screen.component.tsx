@@ -38,11 +38,11 @@ interface IDrawerNavigationProperties {
 interface IBookListScreenProps extends IDbReadyProperty, IDrawerNavigationProperties {
 }
 
-interface IBookListScreenStates {
+interface IBookListScreenState {
     books: Book[];
 }
 
-class _BookListScreen extends Component<IBookListScreenProps, IBookListScreenStates> {
+class _BookListScreen extends Component<IBookListScreenProps, IBookListScreenState> {
     constructor(props: IBookListScreenProps) {
         super(props);
         this.state = {
