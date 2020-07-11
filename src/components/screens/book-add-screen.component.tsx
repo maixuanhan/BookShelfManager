@@ -6,6 +6,7 @@ import { IDbReadyProperty } from '../../reducers/dbready';
 import { connect } from 'react-redux';
 import { searchTitle, IBookInfo } from '../../services/goodreads';
 import { AutoCompleteInput } from '../elements/auto-complete-input.component';
+import { BookAdditionalInfo } from 'src/models/book-additional-info';
 
 interface IDrawerNavigationProperties {
     navigation: {
@@ -42,6 +43,7 @@ interface IBookAddScreenProps extends IDbReadyProperty, IDrawerNavigationPropert
 
 interface IBookAddScreenState extends Partial<Book> {
     autoCompleteBooks: IBookInfo[];
+    additionalInfo?: BookAdditionalInfo;
 }
 
 class _BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreenState> {
@@ -51,13 +53,14 @@ class _BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreenState>
             autoCompleteBooks: [],
             title: '',
             authors: '',
-            description: '',
+            note: '',
             quantity: 0,
             remark: '',
         };
     }
 
     private bookService = new BookService();
+    private updating: boolean = false;
 
     private styles = StyleSheet.create({
         view: {
@@ -100,19 +103,23 @@ class _BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreenState>
     });
 
     private async addBook() {
-        if (this.props.dbReady) {
+        if (this.props.dbReady && !this.updating) {
+            this.updating = true;
             try {
                 const book = new Book();
                 book.title = this.state.title || '';
                 book.authors = this.state.authors || '';
                 book.quantity = this.state.quantity || 0;
-                book.description = this.state.description;
-                book.remark = this.state.remark;
+                book.note = this.state.note;
+                book.remark = JSON.stringify(this.state.additionalInfo);
                 await this.bookService.addBook(book);
             } catch (e) {
-                console.log("Something went wrong while adding book.", e);
+                this.updating = false;
+                console.log("Something went wrong while adding book", e);
             }
             this.props.navigation.navigate("book.list");
+        } else if (this.updating) {
+            console.log("Book is updating");
         } else {
             console.log("Database is not ready");
         }
@@ -131,14 +138,18 @@ class _BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreenState>
             <View style={this.styles.view}>
                 <View style={this.styles.inputView}>
                     <Text style={this.styles.labelForm}>Title</Text>
-                    <AutoCompleteInput
+                    <AutoCompleteInput<IBookInfo>
                         data={this.state.autoCompleteBooks}
                         textMember="title"
                         imageMember="thumbnailUrl"
                         textInputStyle={this.styles.inputForm}
                         onTextChanged={this.onTitleChanged.bind(this)}
-                        onItemSelected={item => {
-                            this.setState({ ...this.state, title: item.title, authors: item.author });
+                        onItemSelected={(item) => {
+                            const additionalInfo = this.state.additionalInfo || {};
+                            additionalInfo.goodReadsId = item.id;
+                            additionalInfo.imageUrl = item.imageUrl;
+                            additionalInfo.thumbnailUrl = item.thumbnailUrl;
+                            this.setState({ ...this.state, title: item.title, authors: item.author, additionalInfo });
                         }} />
                     <Text style={this.styles.labelForm}>Authors</Text>
                     <TextInput style={this.styles.inputForm} value={this.state.authors} onChangeText={text => {
@@ -148,14 +159,13 @@ class _BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreenState>
                     <TextInput style={this.styles.inputForm} value={this.state.quantity?.toString()} onChangeText={text => {
                         this.setState({ ...this.state, quantity: Number(text) });
                     }} />
-                    <Text style={this.styles.labelForm}>Description</Text>
-                    <TextInput style={this.styles.inputForm} value={this.state.description} onChangeText={text => {
-                        this.setState({ ...this.state, description: text });
+                    <Text style={this.styles.labelForm}>Note</Text>
+                    <TextInput style={this.styles.inputForm} value={this.state.note} onChangeText={text => {
+                        this.setState({ ...this.state, note: text });
                     }} />
-                    <Text style={this.styles.labelForm}>Remark</Text>
-                    <TextInput style={this.styles.inputForm} value={this.state.remark} onChangeText={text => {
-                        this.setState({ ...this.state, remark: text });
-                    }} />
+                    {this.state.additionalInfo?.goodReadsId ?
+                        <Text>Goodreads ID: {this.state.additionalInfo.goodReadsId}</Text> :
+                        <></>}
                 </View>
                 <View style={this.styles.buttonView}>
                     <View style={this.styles.wrapButtonView}>
@@ -172,5 +182,5 @@ class _BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreenState>
     }
 }
 
-const mapStateToProps = ({ dbReady }) => ({ dbReady });
+const mapStateToProps = ({ dbReady }: IDbReadyProperty) => ({ dbReady });
 export const BookAddScreen = connect(mapStateToProps)(_BookAddScreen);

@@ -1,9 +1,10 @@
-import React, { Component } from 'react';
-import { Text, Button, FlatList } from 'react-native';
+import React, { Component, ReactElement } from 'react';
+import { Text, Button, FlatList, ListRenderItemInfo, View, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { BookService } from '../../services/book-service';
 import { connect } from 'react-redux';
 import { IDbReadyProperty } from '../../reducers/dbready';
 import { Book } from 'src/models/book';
+import { BookAdditionalInfo } from 'src/models/book-additional-info';
 
 interface IDrawerNavigationProperties {
     navigation: {
@@ -43,6 +44,53 @@ interface IBookListScreenState {
 }
 
 class _BookListScreen extends Component<IBookListScreenProps, IBookListScreenState> {
+    public static bookItemStyle = StyleSheet.create({
+        container: {
+            position: 'relative',
+        },
+        item: {
+            flexDirection: 'row',
+            padding: 5,
+            borderColor: 'cyan',
+            borderWidth: 1
+        },
+        itemImage: {
+            width: 50,
+            height: 70,
+            // backgroundColor: 'orange',
+        },
+        itemText: {
+            flex: 1,
+            padding: 5,
+            // backgroundColor: 'cyan',
+        },
+    });
+
+    public static RenderBookItem(itemInfo: ListRenderItemInfo<Book>): ReactElement {
+        let additionalInfo: BookAdditionalInfo | undefined;
+        if (itemInfo.item.remark) {
+            try {
+                additionalInfo = JSON.parse(itemInfo.item.remark);
+            } catch (e) {
+                console.log("Failed to parse remark:", itemInfo.item.remark);
+            }
+        }
+        return (<>
+            <TouchableOpacity key={itemInfo.index} onPress={() => { console.log("Touch on item", itemInfo.index); }}>
+                <View style={_BookListScreen.bookItemStyle.item}>
+                    {additionalInfo?.thumbnailUrl ?
+                        <Image style={_BookListScreen.bookItemStyle.itemImage}
+                            source={{ uri: additionalInfo.thumbnailUrl }} /> :
+                        <View style={_BookListScreen.bookItemStyle.itemImage}></View>
+                    }
+                    <View style={_BookListScreen.bookItemStyle.itemText}>
+                        <Text>{itemInfo.item.title}</Text>
+                    </View>
+                </View>
+            </TouchableOpacity>
+        </>);
+    }
+
     constructor(props: IBookListScreenProps) {
         super(props);
         this.state = {
@@ -87,8 +135,8 @@ class _BookListScreen extends Component<IBookListScreenProps, IBookListScreenSta
                 />
                 <FlatList
                     data={this.state.books}
-                    renderItem={({ item }) => <Text>{item.title}</Text>}
-                    keyExtractor={item => item.id.toString()}
+                    renderItem={_BookListScreen.RenderBookItem}
+                    keyExtractor={item => item.id?.toString() || 'never'}
                 />
             </>
         );
