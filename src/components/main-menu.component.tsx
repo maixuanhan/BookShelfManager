@@ -20,9 +20,7 @@ const screenList: Array<{ id: string, title: string, component: any }> = [
 
 const CustomDrawerContent = (props: any) => (
     <DrawerContentScrollView {...props}>
-        <Text>I am before the menu</Text>
         <DrawerItemList {...props} />
-        <Text>I am after the menu</Text>
     </DrawerContentScrollView>
 );
 

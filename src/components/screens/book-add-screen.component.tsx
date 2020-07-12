@@ -156,9 +156,13 @@ class _BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreenState>
                         this.setState({ ...this.state, authors: text });
                     }} />
                     <Text style={this.styles.labelForm}>Quantity</Text>
-                    <TextInput style={this.styles.inputForm} value={this.state.quantity?.toString()} onChangeText={text => {
-                        this.setState({ ...this.state, quantity: Number(text) });
-                    }} />
+                    <TextInput
+                        style={this.styles.inputForm}
+                        keyboardType="numeric"
+                        value={this.state.quantity?.toString()}
+                        onChangeText={text => {
+                            this.setState({ ...this.state, quantity: Number(text) });
+                        }} />
                     <Text style={this.styles.labelForm}>Note</Text>
                     <TextInput style={this.styles.inputForm} value={this.state.note} onChangeText={text => {
                         this.setState({ ...this.state, note: text });

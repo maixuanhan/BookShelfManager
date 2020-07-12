@@ -1,5 +1,5 @@
 import React, { Component, ReactElement } from 'react';
-import { Text, Button, FlatList, ListRenderItemInfo, View, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { Text, Button, FlatList, ListRenderItemInfo, View, TouchableOpacity, Image, StyleSheet, ActivityIndicator } from 'react-native';
 import { BookService } from '../../services/book-service';
 import { connect } from 'react-redux';
 import { IDbReadyProperty } from '../../reducers/dbready';
@@ -41,6 +41,7 @@ interface IBookListScreenProps extends IDbReadyProperty, IDrawerNavigationProper
 
 interface IBookListScreenState {
     books: Book[];
+    listInitialElem: ReactElement;
 }
 
 class _BookListScreen extends Component<IBookListScreenProps, IBookListScreenState> {
@@ -52,7 +53,7 @@ class _BookListScreen extends Component<IBookListScreenProps, IBookListScreenSta
             flexDirection: 'row',
             padding: 5,
             borderColor: 'cyan',
-            borderWidth: 1
+            borderWidth: 1,
         },
         itemImage: {
             width: 50,
@@ -72,7 +73,7 @@ class _BookListScreen extends Component<IBookListScreenProps, IBookListScreenSta
             try {
                 additionalInfo = JSON.parse(itemInfo.item.remark);
             } catch (e) {
-                console.log("Failed to parse remark:", itemInfo.item.remark);
+                // console.log("Failed to parse remark:", itemInfo.item.remark, "of book item", itemInfo.index);
             }
         }
         return (<>
@@ -95,21 +96,53 @@ class _BookListScreen extends Component<IBookListScreenProps, IBookListScreenSta
         super(props);
         this.state = {
             books: [],
-        }
+            listInitialElem: this.generateEmptyListComponent(),
+        };
+        this.props.navigation.addListener('focus', () => { this.tryLoadBooks(); });
     }
 
+    private styles = StyleSheet.create({
+        centeredContainer: {
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+        },
+        listContainer: {
+            flexGrow: 1,
+        },
+    });
+
     private bookService = new BookService();
+
+    private generateEmptyListComponent(): ReactElement {
+        return (
+            <View style={this.styles.centeredContainer}>
+                <Text>No book here</Text>
+            </View>
+        );
+    }
+
+    private generateLoadingComponent(): ReactElement {
+        return (
+            <View style={this.styles.centeredContainer}>
+                <ActivityIndicator size="large" />
+            </View>
+        );
+    }
 
     private async tryLoadBooks() {
         if (this.props.dbReady) {
             let books: Book[] = [];
+            const oldListInitialElem = this.state.listInitialElem;
+            const listInitialElem = this.generateLoadingComponent();
+            this.setState({ ...this.state, books, listInitialElem });
             try {
-                const [bs, count] = await this.bookService.getBooks(0, 100);
+                const [bs, count] = await this.bookService.getBooks(0, 500);
                 books = bs;
             } catch (e) {
                 console.log("Error happens while fetching books.", e);
             }
-            this.setState({ ...this.state, books });
+            this.setState({ ...this.state, books, listInitialElem: oldListInitialElem });
         }
     }
 
@@ -125,20 +158,13 @@ class _BookListScreen extends Component<IBookListScreenProps, IBookListScreenSta
 
     public render() {
         return (
-            <>
-                <Text>This is LIST of BOOKS screen</Text>
-                <Button
-                    title="Add book"
-                    onPress={() => {
-                        this.props.navigation.navigate("book.add");
-                    }}
-                />
-                <FlatList
-                    data={this.state.books}
-                    renderItem={_BookListScreen.RenderBookItem}
-                    keyExtractor={item => item.id?.toString() || 'never'}
-                />
-            </>
+            <FlatList
+                contentContainerStyle={this.styles.listContainer}
+                ListEmptyComponent={this.state.listInitialElem}
+                data={this.state.books}
+                renderItem={_BookListScreen.RenderBookItem}
+                keyExtractor={item => item.id?.toString() || 'never'}
+            />
         );
     }
 }

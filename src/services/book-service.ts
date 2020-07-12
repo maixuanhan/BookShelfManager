@@ -3,11 +3,16 @@ import { Label } from "../models/label";
 
 export class BookService {
     public async getBooks(skip: number, take: number): Promise<[Book[], number]> {
-        return Book.findAndCount({ relations: ["labels"], skip, take });
+        console.log(`getBooks(skip=${skip}, take=${take})`);
+        return Book.findAndCount({
+            order: { createdDate: "DESC" },
+            relations: ["labels"],
+            skip, take,
+        });
     }
 
     public async addBook(info: Partial<Book>, labels?: Label[]): Promise<Book> {
-        const book = new Book(undefined, info.title, info.authors, info.quantity, info.description, info.remark);
+        const book = new Book(undefined, info.title, info.authors, info.quantity, info.note, info.remark);
         if (labels) {
             for (const label of labels) {
                 if (!label.id) {

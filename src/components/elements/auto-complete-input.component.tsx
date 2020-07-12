@@ -10,7 +10,7 @@ interface IAutoCompleteInputProps<T> {
     onTextChanged?: (text: string) => any;
     onItemSelected?: (item: T) => any;
     textMember: keyof StringProperties<T>;
-    imageMember: keyof StringProperties<T>;
+    imageMember?: keyof StringProperties<T>;
     data: T[];
 }
 
@@ -54,13 +54,13 @@ export class AutoCompleteInput<T> extends Component<IAutoCompleteInputProps<T>, 
         item: {
             flexDirection: 'row',
             padding: 5,
-            paddingRight: 50,
         },
         itemImage: {
             width: 50,
             height: 70,
         },
         itemText: {
+            flex: 1,
             padding: 5,
         },
     });
@@ -96,7 +96,10 @@ export class AutoCompleteInput<T> extends Component<IAutoCompleteInputProps<T>, 
                         {this.props.data.map((entry, i) => (
                             <TouchableOpacity key={i} onPress={() => { this.onItemSelected(entry); }}>
                                 <View style={this.defaultStyle.item}>
-                                    <Image style={this.defaultStyle.itemImage} source={{ uri: String(entry[this.props.imageMember]) }} />
+                                    {this.props.imageMember ?
+                                        <Image style={this.defaultStyle.itemImage} source={{ uri: String(entry[this.props.imageMember]) }} /> :
+                                        <></>
+                                    }
                                     <View style={this.defaultStyle.itemText}>
                                         <Text>{entry[this.props.textMember]}</Text>
                                     </View>
