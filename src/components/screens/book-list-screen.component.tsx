@@ -48,22 +48,34 @@ class _BookListScreen extends Component<IBookListScreenProps, IBookListScreenSta
     public static bookItemStyle = StyleSheet.create({
         container: {
             position: 'relative',
+            backgroundColor: "#f2f2f2",
         },
         item: {
+            backgroundColor: "#fff",
             flexDirection: 'row',
             padding: 5,
-            borderColor: 'cyan',
-            borderWidth: 1,
+
+            borderRadius: 5,
+            marginRight: 7,
+            marginLeft: 7,
+            marginTop: 7,
+
+            shadowColor: "#000",
+            shadowOffset: {
+                width: 0,
+                height: 1,
+            },
+            shadowOpacity: 0.2,
+            shadowRadius: 2,
+            elevation: 1,
         },
         itemImage: {
             width: 50,
             height: 70,
-            // backgroundColor: 'orange',
         },
         itemText: {
             flex: 1,
             padding: 5,
-            // backgroundColor: 'cyan',
         },
     });
 
