@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, Button, StyleSheet, TextInput, View } from 'react-native';
+import { Text, Button, StyleSheet, TextInput, View, ScrollView } from 'react-native';
 import { Book } from '../../models/book';
 import { BookService } from '../../services/book-service';
 import { IDbReadyProperty } from '../../reducers/dbready';
@@ -86,6 +86,7 @@ class _BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreenState>
         },
         inputView: {
             flex: 1,
+            marginBottom: 10,
         },
         buttonView: {
             flexDirection: "row-reverse",
@@ -136,7 +137,7 @@ class _BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreenState>
     render() {
         return (
             <View style={this.styles.view}>
-                <View style={this.styles.inputView}>
+                <ScrollView style={this.styles.inputView}>
                     <Text style={this.styles.labelForm}>Title</Text>
                     <AutoCompleteInput<IBookInfo>
                         data={this.state.autoCompleteBooks}
@@ -170,7 +171,7 @@ class _BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreenState>
                     {this.state.additionalInfo?.goodReadsId ?
                         <Text>Goodreads ID: {this.state.additionalInfo.goodReadsId}</Text> :
                         <></>}
-                </View>
+                </ScrollView>
                 <View style={this.styles.buttonView}>
                     <View style={this.styles.wrapButtonView}>
                         <Button color={this.styles.saveButton.backgroundColor} title="Save"
