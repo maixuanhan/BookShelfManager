@@ -88,6 +88,7 @@ export class AutoCompleteInput<T> extends Component<IAutoCompleteInputProps<T>, 
                         }
                     }}
                     onLayout={e => {
+                        // console.log(e);
                         this.setState({ ...this.state, listStyle: this.makeListStyle(e.nativeEvent.layout.height, e.nativeEvent.layout.width) });
                     }}
                     value={this.state.value} />

@@ -68,7 +68,6 @@ class _BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreenState>
             flexDirection: "column",
             justifyContent: "space-between",
             padding: 10,
-            // backgroundColor: "#fff",
         },
         labelForm: {
             marginBottom: 4,

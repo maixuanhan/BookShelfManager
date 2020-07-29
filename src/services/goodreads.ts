@@ -46,7 +46,6 @@ export async function searchTitle(query: string): Promise<IBookInfo[]> {
         // console.log("xmlDoc", xmlDoc);
         const books = xmlDoc.getElementsByTagName("best_book");
         if (books) {
-            console.log("Result count:", books.length);
             for (let i = 0; i < Math.min(10, books.length); ++i) {
                 const b = books[i];
                 const id = Number(b.getElementsByTagName("id")[0]?.firstChild?.nodeValue);
@@ -54,7 +53,6 @@ export async function searchTitle(query: string): Promise<IBookInfo[]> {
                 const author = b.getElementsByTagName("author")[0]?.getElementsByTagName("name")[0]?.firstChild?.nodeValue || undefined;
                 const imageUrl = b.getElementsByTagName("image_url")[0]?.firstChild?.nodeValue || undefined;
                 const thumbnailUrl = b.getElementsByTagName("small_image_url")[0]?.firstChild?.nodeValue || undefined;
-                console.log(title);
                 if (title) { result.push({ id, title, author, imageUrl, thumbnailUrl }); }
             }
         }

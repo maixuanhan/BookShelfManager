@@ -1,8 +1,9 @@
 import { Book } from "../models/book";
 import { Label } from "../models/label";
+import { DeleteResult } from "typeorm/browser";
 
 export class BookService {
-    public async getBooks(skip: number, take: number): Promise<[Book[], number]> {
+    public getBooks(skip: number, take: number): Promise<[Book[], number]> {
         console.log(`getBooks(skip=${skip}, take=${take})`);
         return Book.findAndCount({
             order: { createdDate: "DESC" },
@@ -24,7 +25,11 @@ export class BookService {
         return book.save();
     }
 
-    public async updateBook(book: Book): Promise<Book> {
+    public updateBook(book: Book): Promise<Book> {
         return book.save()
+    }
+
+    public deleteBook(id: number): Promise<DeleteResult> {
+        return Book.delete(id);
     }
 }
