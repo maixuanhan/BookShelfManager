@@ -19,6 +19,7 @@ export class BookItem extends Component<IBookItemProps, IBookItemState> {
             backgroundColor: 'red',
             marginTop: 7,
             marginLeft: -7,
+            marginRight: 7,
         },
         actionText: {
             color: '#fff',
