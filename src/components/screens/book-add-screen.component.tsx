@@ -2,11 +2,10 @@ import React, { Component } from 'react';
 import { Text, Button, StyleSheet, TextInput, View, ScrollView } from 'react-native';
 import { Book } from '../../models/book';
 import { BookService } from '../../services/book-service';
-import { IDbReadyProperty } from '../../reducers/dbready';
-import { connect } from 'react-redux';
 import { searchTitle, IBookInfo } from '../../services/goodreads';
 import { AutoCompleteInput } from '../elements/auto-complete-input.component';
 import { BookAdditionalInfo } from 'src/models/book-additional-info';
+import { DbReadyConsumer } from '../elements/db-ready';
 
 interface IDrawerNavigationProperties {
     navigation: {
@@ -38,7 +37,7 @@ interface IDrawerNavigationProperties {
     }
 }
 
-interface IBookAddScreenProps extends IDbReadyProperty, IDrawerNavigationProperties {
+interface IBookAddScreenProps extends IDrawerNavigationProperties {
 }
 
 interface IBookAddScreenState extends Partial<Book> {
@@ -46,7 +45,7 @@ interface IBookAddScreenState extends Partial<Book> {
     additionalInfo?: BookAdditionalInfo;
 }
 
-class _BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreenState> {
+export class BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreenState> {
     constructor(props: IBookAddScreenProps) {
         super(props);
         this.state = {
@@ -102,8 +101,8 @@ class _BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreenState>
         }
     });
 
-    private async addBook() {
-        if (this.props.dbReady && !this.updating) {
+    private async addBook(dbReady: boolean) {
+        if (dbReady && !this.updating) {
             this.updating = true;
             try {
                 const book = new Book();
@@ -135,56 +134,56 @@ class _BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreenState>
 
     render() {
         return (
-            <View style={this.styles.view}>
-                <ScrollView style={this.styles.inputView}>
-                    <Text style={this.styles.labelForm}>Title</Text>
-                    <AutoCompleteInput<IBookInfo>
-                        data={this.state.autoCompleteBooks}
-                        textMember="title"
-                        imageMember="thumbnailUrl"
-                        textInputStyle={this.styles.inputForm}
-                        onTextChanged={this.onTitleChanged.bind(this)}
-                        onItemSelected={(item) => {
-                            const additionalInfo = this.state.additionalInfo || {};
-                            additionalInfo.goodReadsId = item.id;
-                            additionalInfo.imageUrl = item.imageUrl;
-                            additionalInfo.thumbnailUrl = item.thumbnailUrl;
-                            this.setState({ ...this.state, title: item.title, authors: item.author, additionalInfo });
-                        }} />
-                    <Text style={this.styles.labelForm}>Authors</Text>
-                    <TextInput style={this.styles.inputForm} value={this.state.authors} onChangeText={text => {
-                        this.setState({ ...this.state, authors: text });
-                    }} />
-                    <Text style={this.styles.labelForm}>Quantity</Text>
-                    <TextInput
-                        style={this.styles.inputForm}
-                        keyboardType="numeric"
-                        value={this.state.quantity?.toString()}
-                        onChangeText={text => {
-                            this.setState({ ...this.state, quantity: Number(text) });
-                        }} />
-                    <Text style={this.styles.labelForm}>Note</Text>
-                    <TextInput style={this.styles.inputForm} value={this.state.note} onChangeText={text => {
-                        this.setState({ ...this.state, note: text });
-                    }} />
-                    {this.state.additionalInfo?.goodReadsId ?
-                        <Text>Goodreads ID: {this.state.additionalInfo.goodReadsId}</Text> :
-                        <></>}
-                </ScrollView>
-                <View style={this.styles.buttonView}>
-                    <View style={this.styles.wrapButtonView}>
-                        <Button color={this.styles.saveButton.backgroundColor} title="Save"
-                            onPress={() => { this.addBook(); }} />
-                    </View>
-                    <View style={this.styles.wrapButtonView}>
-                        <Button color={this.styles.cancelButton.backgroundColor} title="Cancel"
-                            onPress={() => { this.props.navigation.navigate("book.list"); }} />
-                    </View>
-                </View>
-            </View>
+            <DbReadyConsumer>
+                {({ dbReady }) => (
+                    <View style={this.styles.view}>
+                        <ScrollView style={this.styles.inputView}>
+                            <Text style={this.styles.labelForm}>Title</Text>
+                            <AutoCompleteInput<IBookInfo>
+                                data={this.state.autoCompleteBooks}
+                                textMember="title"
+                                imageMember="thumbnailUrl"
+                                textInputStyle={this.styles.inputForm}
+                                onTextChanged={this.onTitleChanged.bind(this)}
+                                onItemSelected={(item) => {
+                                    const additionalInfo = this.state.additionalInfo || {};
+                                    additionalInfo.goodReadsId = item.id;
+                                    additionalInfo.imageUrl = item.imageUrl;
+                                    additionalInfo.thumbnailUrl = item.thumbnailUrl;
+                                    this.setState({ ...this.state, title: item.title, authors: item.author, additionalInfo });
+                                }} />
+                            <Text style={this.styles.labelForm}>Authors</Text>
+                            <TextInput style={this.styles.inputForm} value={this.state.authors} onChangeText={text => {
+                                this.setState({ ...this.state, authors: text });
+                            }} />
+                            <Text style={this.styles.labelForm}>Quantity</Text>
+                            <TextInput
+                                style={this.styles.inputForm}
+                                keyboardType="numeric"
+                                value={this.state.quantity?.toString()}
+                                onChangeText={text => {
+                                    this.setState({ ...this.state, quantity: Number(text) });
+                                }} />
+                            <Text style={this.styles.labelForm}>Note</Text>
+                            <TextInput style={this.styles.inputForm} value={this.state.note} onChangeText={text => {
+                                this.setState({ ...this.state, note: text });
+                            }} />
+                            {this.state.additionalInfo?.goodReadsId ?
+                                <Text>Goodreads ID: {this.state.additionalInfo.goodReadsId}</Text> :
+                                <></>}
+                        </ScrollView>
+                        <View style={this.styles.buttonView}>
+                            <View style={this.styles.wrapButtonView}>
+                                <Button color={this.styles.saveButton.backgroundColor} title="Save"
+                                    onPress={() => { this.addBook(dbReady); }} />
+                            </View>
+                            <View style={this.styles.wrapButtonView}>
+                                <Button color={this.styles.cancelButton.backgroundColor} title="Cancel"
+                                    onPress={() => { this.props.navigation.navigate("book.list"); }} />
+                            </View>
+                        </View>
+                    </View>)}
+            </DbReadyConsumer>
         );
     }
 }
-
-const mapStateToProps = ({ dbReady }: IDbReadyProperty) => ({ dbReady });
-export const BookAddScreen = connect(mapStateToProps)(_BookAddScreen);

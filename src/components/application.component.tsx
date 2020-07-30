@@ -1,17 +1,13 @@
 import React, { Component } from 'react';
-import { Provider } from 'react-redux';
-import { createStore } from 'redux';
-import rootReducer from '../reducers';
 import { MainMenu } from './main-menu.component';
-
-const store = createStore(rootReducer)
+import { DbReadyProvider } from './elements/db-ready';
 
 export class Application extends Component {
   public render() {
     return (
-      <Provider store={store}>
+      <DbReadyProvider>
         <MainMenu />
-      </Provider >
+      </DbReadyProvider>
     );
   }
 }

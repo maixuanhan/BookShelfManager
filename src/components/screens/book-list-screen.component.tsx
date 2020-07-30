@@ -1,8 +1,6 @@
 import React, { Component, ReactElement } from 'react';
 import { Text, FlatList, ListRenderItemInfo, View, StyleSheet, ActivityIndicator } from 'react-native';
 import { BookService } from '../../services/book-service';
-import { connect } from 'react-redux';
-import { IDbReadyProperty } from '../../reducers/dbready';
 import { Book } from 'src/models/book';
 import { BookItem } from '../elements/book-item.component';
 
@@ -28,15 +26,16 @@ interface IDrawerNavigationProperties {
         setOptions: Function,
         setParams: Function,
         toggleDrawer: Function
-    },
+    };
     route: {
         key: string,
         name: string,
         params: any
-    }
+    };
+    dbReady: boolean;
 }
 
-interface IBookListScreenProps extends IDbReadyProperty, IDrawerNavigationProperties {
+interface IBookListScreenProps extends IDrawerNavigationProperties {
 }
 
 interface IBookListScreenState {
@@ -44,7 +43,7 @@ interface IBookListScreenState {
     listInitialElem: ReactElement;
 }
 
-class _BookListScreen extends Component<IBookListScreenProps, IBookListScreenState> {
+export class BookListScreen extends Component<IBookListScreenProps, IBookListScreenState> {
     constructor(props: IBookListScreenProps) {
         super(props);
         this.state = {
@@ -130,6 +129,3 @@ class _BookListScreen extends Component<IBookListScreenProps, IBookListScreenSta
         );
     }
 }
-
-const mapStateToProps = (obj: IDbReadyProperty) => ({ dbReady: obj.dbReady });
-export const BookListScreen = connect(mapStateToProps)(_BookListScreen);

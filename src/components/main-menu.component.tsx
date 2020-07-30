@@ -4,8 +4,7 @@ import { Text } from 'react-native';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
 import { BookScreen } from './screens/book-screen.component';
-import { connect } from 'react-redux';
-import { setDbReady } from '../reducers/dbready';
+import { DbReadyConsumer } from './elements/db-ready';
 
 const Drawer = createDrawerNavigator();
 
@@ -25,29 +24,32 @@ const CustomDrawerContent = (props: any) => (
 );
 
 interface IMainMenuProperties {
-    dispatch: Function;
 }
 
-class _MainMenu extends Component<IMainMenuProperties> {
-    public componentDidMount() {
-        this.props.dispatch(setDbReady(false));
+export class MainMenu extends Component<IMainMenuProperties> {
+    public initializeDb(callback: (value: boolean) => void) {
         Database.initialize()
-            .then(() => {
-                this.props.dispatch(setDbReady(true));
-            })
+            .then(() => { callback(true); })
             .catch(err => { console.log("TODO: handle db init error", err) });
     }
     public render() {
         return (
-            <NavigationContainer>
-                <Drawer.Navigator initialRouteName="books" drawerContent={CustomDrawerContent}>
-                    {screenList.map((item) => <Drawer.Screen key={item.id} name={item.id} component={item.component} options={{
-                        drawerLabel: item.title
-                    }} />)}
-                </Drawer.Navigator>
-            </NavigationContainer>
+            <DbReadyConsumer>
+                {({ dbReady, changeDbReady }) => {
+                    if (!dbReady) {
+                        this.initializeDb(changeDbReady);
+                    }
+                    return (
+                        <NavigationContainer>
+                            <Drawer.Navigator initialRouteName="books" drawerContent={CustomDrawerContent}>
+                                {screenList.map((item) => <Drawer.Screen key={item.id} name={item.id} component={item.component} options={{
+                                    drawerLabel: item.title
+                                }} />)}
+                            </Drawer.Navigator>
+                        </NavigationContainer>
+                    );
+                }}
+            </DbReadyConsumer>
         );
     }
 }
-
-export const MainMenu = connect()(_MainMenu);
