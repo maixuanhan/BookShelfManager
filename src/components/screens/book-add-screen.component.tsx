@@ -105,18 +105,20 @@ export class BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreen
         if (dbReady && !this.updating) {
             this.updating = true;
             try {
-                const book = new Book();
-                book.title = this.state.title || '';
-                book.authors = this.state.authors || '';
-                book.quantity = this.state.quantity || 0;
-                book.note = this.state.note;
-                book.remark = JSON.stringify(this.state.additionalInfo);
-                await this.bookService.addBook(book);
+                const book: Partial<Book> = {
+                    title: this.state.title || '',
+                    authors: this.state.authors || '',
+                    quantity: this.state.quantity || 0,
+                    note: this.state.note,
+                    remark: JSON.stringify(this.state.additionalInfo),
+                };
+                const result = await this.bookService.addBook(book);
+                book.id = result.id;
+                this.props.navigation.navigate("book.list", { new: book });
             } catch (e) {
                 this.updating = false;
                 console.log("Something went wrong while adding book", e);
             }
-            this.props.navigation.navigate("book.list");
         } else if (this.updating) {
             console.log("Book is updating");
         } else {

@@ -50,7 +50,7 @@ export class BookListScreen extends Component<IBookListScreenProps, IBookListScr
             books: [],
             listInitialElem: this.generateEmptyListComponent(),
         };
-        this.props.navigation.addListener('focus', () => { this.tryLoadBooks(); });
+        // this.props.navigation.addListener('focus', () => { this.tryLoadBooks(); });
     }
 
     private styles = StyleSheet.create({
@@ -105,9 +105,15 @@ export class BookListScreen extends Component<IBookListScreenProps, IBookListScr
     }
 
     public componentDidUpdate(prevProps: IBookListScreenProps) {
-        console.log("componentDidUpdate event");
+        console.log("componentDidUpdate event:", this.props.route?.params?.new?.id);
         if (this.props.dbReady !== prevProps.dbReady && this.props.dbReady) {
             this.tryLoadBooks();
+        }
+        if (this.props.route?.params?.new?.id !== prevProps.route?.params?.new?.id) {
+            if (this.props.route?.params?.new?.id) {
+                this.state.books.unshift(this.props.route.params.new as Book);
+                this.setState({ ...this.state });
+            }
         }
     }
 
