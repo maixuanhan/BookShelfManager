@@ -1,6 +1,6 @@
-import { createConnection, Connection } from "typeorm/browser";
-import { Book } from "./models/book";
-import { Label } from "./models/label";
+import { createConnection, Connection } from 'typeorm/browser';
+import { Book } from './models/book';
+import { Label } from './models/label';
 
 export class Database {
     public static connection?: Connection;
@@ -15,11 +15,11 @@ export class Database {
     public static async initialize(): Promise<void> {
         if (Database.connection && Database.connection.isConnected) { return; }
         Database.connection = await createConnection({
-            type: "react-native",
-            database: "bookshelfmanager",
-            location: "default",
+            type: 'react-native',
+            database: 'bookshelfmanager',
+            location: 'default',
             synchronize: true,
-            entities: [Book, Label]
+            entities: [Book, Label],
         });
     }
 }

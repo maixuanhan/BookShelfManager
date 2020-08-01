@@ -27,8 +27,8 @@ export class BookListScreen extends Component<IBookListScreenProps, IBookListScr
     private styles = StyleSheet.create({
         centeredContainer: {
             flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
+            justifyContent: 'center',
+            alignItems: 'center',
         },
         listContainer: {
             flexGrow: 1,
@@ -55,7 +55,7 @@ export class BookListScreen extends Component<IBookListScreenProps, IBookListScr
 
     private async tryLoadBooks() {
         if (this.props.dbReady) {
-            console.log("try load books...");
+            console.log('try load books...');
             let books: Book[] = [];
             const oldListInitialElem = this.state.listInitialElem;
             const listInitialElem = this.generateLoadingComponent();
@@ -63,20 +63,21 @@ export class BookListScreen extends Component<IBookListScreenProps, IBookListScr
             try {
                 const [bs, count] = await this.bookService.getBooks(0, 500);
                 books = bs;
+                console.log('Total count:', count);
             } catch (e) {
-                console.log("Error happens while fetching books.", e);
+                console.log('Error happens while fetching books.', e);
             }
             this.setState({ ...this.state, books, listInitialElem: oldListInitialElem });
         }
     }
 
     public componentDidMount() {
-        console.log("componentDidMount event");
+        console.log('componentDidMount event');
         this.tryLoadBooks();
     }
 
     public componentDidUpdate(prevProps: IBookListScreenProps) {
-        console.log("componentDidUpdate event:", this.props.route?.params?.new?.id);
+        console.log('componentDidUpdate event:', this.props.route?.params?.new?.id);
         if (this.props.dbReady !== prevProps.dbReady && this.props.dbReady) {
             this.tryLoadBooks();
         }
@@ -94,13 +95,14 @@ export class BookListScreen extends Component<IBookListScreenProps, IBookListScr
                 contentContainerStyle={this.styles.listContainer}
                 ListEmptyComponent={this.state.listInitialElem}
                 data={this.state.books}
-                renderItem={(info: ListRenderItemInfo<Book>) => <BookItem book={info.item} onDeleted={async (book: Book) => {
-                    if (book.id) {
-                        this.bookService.deleteBook(book.id);
-                        const books = this.state.books.filter(b => b.id !== book.id);
-                        this.setState({ ...this.state, books });
-                    }
-                }} />}
+                renderItem={(info: ListRenderItemInfo<Book>) =>
+                    <BookItem book={info.item} onDeleted={async (book: Book) => {
+                        if (book.id) {
+                            this.bookService.deleteBook(book.id);
+                            const books = this.state.books.filter(b => b.id !== book.id);
+                            this.setState({ ...this.state, books });
+                        }
+                    }} />}
                 keyExtractor={item => item.id?.toString() || 'never'}
             />
         );

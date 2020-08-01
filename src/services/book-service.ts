@@ -1,13 +1,13 @@
-import { Book } from "../models/book";
-import { Label } from "../models/label";
-import { DeleteResult } from "typeorm/browser";
+import { Book } from '../models/book';
+import { Label } from '../models/label';
+import { DeleteResult } from 'typeorm/browser';
 
 export class BookService {
     public getBooks(skip: number, take: number): Promise<[Book[], number]> {
         console.log(`getBooks(skip=${skip}, take=${take})`);
         return Book.findAndCount({
-            order: { createdDate: "DESC" },
-            relations: ["labels"],
+            order: { createdDate: 'DESC' },
+            relations: ['labels'],
             skip, take,
         });
     }

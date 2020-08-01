@@ -1,13 +1,13 @@
-import React, { Component } from "react";
-import { TouchableOpacity, View, Text, Animated, StyleSheet, GestureResponderEvent } from "react-native";
+import React, { Component } from 'react';
+import { TouchableOpacity, View, Text, Animated, StyleSheet, GestureResponderEvent } from 'react-native';
 
 interface ISwipeableRightActionProps {
-    progressAnimatedValue: Animated.AnimatedInterpolation,
-    dragAnimatedValue: Animated.AnimatedInterpolation,
-    title: string,
-    action: (event: GestureResponderEvent) => void,
-    containerStyle?: any,
-    textStyle?: any,
+    progressAnimatedValue: Animated.AnimatedInterpolation;
+    dragAnimatedValue: Animated.AnimatedInterpolation;
+    title: string;
+    action: (event: GestureResponderEvent) => void;
+    containerStyle?: any;
+    textStyle?: any;
 }
 
 interface ISwipeableRightActionState {
@@ -25,7 +25,7 @@ export class SwipeableRightAction extends Component<ISwipeableRightActionProps, 
             fontWeight: '600',
             padding: 20,
             ...this.props.textStyle,
-        }
+        },
     });
     public render() {
         return (

@@ -15,7 +15,7 @@ export class BookScreen extends Component<IBookScreenProps> {
     private styles = StyleSheet.create({
         addBookView: {
             marginRight: 10,
-        }
+        },
     });
     render() {
         return (
@@ -23,13 +23,13 @@ export class BookScreen extends Component<IBookScreenProps> {
                 {({ dbReady }) => (
                     <Stack.Navigator initialRouteName="book.list" headerMode="screen">
                         <Stack.Screen name="book.list" options={{
-                            title: "Book list",
+                            title: 'Book list',
                             headerRight: () => {
                                 return (
                                     <View style={this.styles.addBookView}>
                                         <Button
                                             title="Add book"
-                                            onPress={() => { this.props.navigation.navigate("book.add"); }}
+                                            onPress={() => { this.props.navigation.navigate('book.add'); }}
                                         />
                                     </View>
                                 );
@@ -37,7 +37,7 @@ export class BookScreen extends Component<IBookScreenProps> {
                         }} >
                             {(props) => <BookListScreen {...props} dbReady={dbReady} />}
                         </Stack.Screen>
-                        <Stack.Screen name="book.add" component={BookAddScreen} options={{ title: "Add new book" }} />
+                        <Stack.Screen name="book.add" component={BookAddScreen} options={{ title: 'Add new book' }} />
                     </Stack.Navigator>
                 )}
             </DbReadyConsumer>

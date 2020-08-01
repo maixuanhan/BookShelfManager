@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, Button, StyleSheet, TextInput, View, FlatList, Modal, Alert, TouchableHighlight } from 'react-native';
+import { Text, Button, StyleSheet, TextInput, View, FlatList, Alert } from 'react-native';
 import { Book } from '../../models/book';
 import { BookService } from '../../services/book-service';
 import { searchTitle, IBookInfo } from '../../services/goodreads';
@@ -31,12 +31,12 @@ export class BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreen
     }
 
     private bookService = new BookService();
-    private updating: boolean = false;
+    private updating = false;
 
     private styles = StyleSheet.create({
         view: {
             flexGrow: 1,
-            justifyContent: "space-between",
+            justifyContent: 'space-between',
             padding: 10,
         },
         labelForm: {
@@ -45,9 +45,9 @@ export class BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreen
         },
         inputForm: {
             marginBottom: 12,
-            backgroundColor: "#fff",
-            borderColor: "#ced4da",
-            borderStyle: "solid",
+            backgroundColor: '#fff',
+            borderColor: '#ced4da',
+            borderStyle: 'solid',
             borderWidth: 1,
             borderRadius: 4,
             height: 38,
@@ -58,18 +58,18 @@ export class BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreen
             marginBottom: 10,
         },
         buttonView: {
-            flexDirection: "row-reverse",
+            flexDirection: 'row-reverse',
         },
         wrapButtonView: {
             flex: 1,
-            margin: 5
+            margin: 5,
         },
         saveButton: {
-            backgroundColor: "#007bff",
+            backgroundColor: '#007bff',
         },
         cancelButton: {
-            backgroundColor: "#6c757d",
-        }
+            backgroundColor: '#6c757d',
+        },
     });
 
     private async addBook(dbReady: boolean) {
@@ -77,8 +77,14 @@ export class BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreen
             this.updating = true;
             try {
                 const validationResult = new Validator([
-                    { validator: (title) => title, data: [this.state.title], failMessage: 'Title must not be empty' },
-                    { validator: (quantity) => quantity > 0, data: [this.state.quantity], failMessage: 'You must own at least 1 book' },
+                    {
+                        validator: (title) => title, data: [this.state.title],
+                        failMessage: 'Title must not be empty',
+                    },
+                    {
+                        validator: (quantity) => quantity > 0, data: [this.state.quantity],
+                        failMessage: 'You must own at least 1 book',
+                    },
                 ]).validate();
                 if (!validationResult.ok) {
                     throw new Error(validationResult.message);
@@ -92,16 +98,16 @@ export class BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreen
                 };
                 const result = await this.bookService.addBook(book);
                 book.id = result.id;
-                this.props.navigation.navigate("book.list", { new: book });
+                this.props.navigation.navigate('book.list', { new: book });
             } catch (e) {
                 this.updating = false;
                 // console.log("Error while adding book:", e);
                 Alert.alert(`Cannot add book: ${e.message}`);
             }
         } else if (this.updating) {
-            console.log("Book is updating");
+            console.log('Book is updating');
         } else {
-            console.log("Database is not ready");
+            console.log('Database is not ready');
         }
     }
 
@@ -121,7 +127,7 @@ export class BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreen
                         data={[1]}
                         keyExtractor={item => item.toString()}
                         contentContainerStyle={this.styles.view}
-                        renderItem={(props) => (
+                        renderItem={() => (
                             <View style={this.styles.inputView}>
                                 <Text style={this.styles.labelForm}>Title</Text>
                                 <AutoCompleteInput<IBookInfo>
@@ -137,12 +143,18 @@ export class BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreen
                                         additionalInfo.goodReadsId = item.id;
                                         additionalInfo.imageUrl = item.imageUrl;
                                         additionalInfo.thumbnailUrl = item.thumbnailUrl;
-                                        this.setState({ ...this.state, title: item.title, authors: item.author, additionalInfo });
+                                        this.setState({
+                                            ...this.state, title: item.title, authors: item.author, additionalInfo,
+                                        });
                                     }} />
                                 <Text style={this.styles.labelForm}>Authors</Text>
-                                <TextInput style={this.styles.inputForm} value={this.state.authors} onChangeText={text => {
-                                    this.setState({ ...this.state, authors: text });
-                                }} />
+                                <TextInput
+                                    style={this.styles.inputForm}
+                                    value={this.state.authors}
+                                    onChangeText={text => {
+                                        this.setState({ ...this.state, authors: text });
+                                    }}
+                                />
                                 <Text style={this.styles.labelForm}>Quantity</Text>
                                 <TextInput
                                     style={this.styles.inputForm}
@@ -168,7 +180,7 @@ export class BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreen
                                 </View>
                                 <View style={this.styles.wrapButtonView}>
                                     <Button color={this.styles.cancelButton.backgroundColor} title="Cancel"
-                                        onPress={() => { this.props.navigation.navigate("book.list"); }} />
+                                        onPress={() => { this.props.navigation.navigate('book.list'); }} />
                                 </View>
                             </View>
                         }

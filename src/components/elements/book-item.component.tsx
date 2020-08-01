@@ -1,9 +1,9 @@
-import React, { Component } from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
-import { Book } from "src/models/book";
+import React, { Component } from 'react';
+import { View, Text, StyleSheet, Image } from 'react-native';
+import { Book } from 'src/models/book';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
-import { BookAdditionalInfo } from "src/models/book-additional-info";
-import { SwipeableRightAction } from "./swipeable-right-action.component";
+import { BookAdditionalInfo } from 'src/models/book-additional-info';
+import { SwipeableRightAction } from './swipeable-right-action.component';
 
 interface IBookItemProps {
     book: Book;
@@ -25,7 +25,7 @@ export class BookItem extends Component<IBookItemProps, IBookItemState> {
             color: '#fff',
         },
         item: {
-            backgroundColor: "#fff",
+            backgroundColor: '#fff',
             flexDirection: 'row',
             padding: 5,
 
@@ -33,7 +33,7 @@ export class BookItem extends Component<IBookItemProps, IBookItemState> {
             marginLeft: 7,
             marginTop: 7,
 
-            shadowColor: "#000",
+            shadowColor: '#000',
             shadowOffset: {
                 width: 0,
                 height: 1,

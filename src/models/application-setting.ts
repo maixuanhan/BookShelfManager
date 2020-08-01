@@ -1,6 +1,6 @@
 import {
     Entity, PrimaryGeneratedColumn, Column, BaseEntity, CreateDateColumn, UpdateDateColumn,
-} from "typeorm/browser";
+} from 'typeorm/browser';
 
 @Entity()
 export class ApplicationSetting extends BaseEntity {

@@ -8,13 +8,13 @@ import { DbReadyConsumer } from './elements/db-ready.context.component';
 
 const Drawer = createDrawerNavigator();
 
-const HomeScreen = (options: any) => {
+const HomeScreen = () => {
     return (<Text>This is HOME screen</Text>);
 };
 
 const screenList: Array<{ id: string, title: string, component: any }> = [
-    { id: "home", title: "Home", component: HomeScreen },
-    { id: "books", title: "Books", component: BookScreen },
+    { id: 'home', title: 'Home', component: HomeScreen },
+    { id: 'books', title: 'Books', component: BookScreen },
 ];
 
 const CustomDrawerContent = (props: any) => (
@@ -30,7 +30,7 @@ export class MainMenu extends Component<IMainMenuProperties> {
     public initializeDb(callback: (value: boolean) => void) {
         Database.initialize()
             .then(() => { callback(true); })
-            .catch(err => { console.log("TODO: handle db init error", err) });
+            .catch(err => { console.log('TODO: handle db init error', err) });
     }
     public render() {
         return (
@@ -42,9 +42,10 @@ export class MainMenu extends Component<IMainMenuProperties> {
                     return (
                         <NavigationContainer>
                             <Drawer.Navigator initialRouteName="books" drawerContent={CustomDrawerContent}>
-                                {screenList.map((item) => <Drawer.Screen key={item.id} name={item.id} component={item.component} options={{
-                                    drawerLabel: item.title
-                                }} />)}
+                                {screenList.map(item =>
+                                    <Drawer.Screen key={item.id} name={item.id} component={item.component} options={{
+                                        drawerLabel: item.title,
+                                    }} />)}
                             </Drawer.Navigator>
                         </NavigationContainer>
                     );

@@ -6,6 +6,8 @@
     },
     "extends": [
         "eslint:recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended",
         "plugin:react/recommended"
     ],
     "globals": {
@@ -23,10 +25,44 @@
     },
     "plugins": [
         "react",
-        "@typescript-eslint",
-        "prettier"
+        "prettier",
+        "@typescript-eslint"
     ],
     "rules": {
-        "prettier/prettier": "warn"
+        "no-console": "off", /* TODO: "error" in the live environment */
+        "max-len": [
+            "error",
+            {
+                "code": 120,
+                "tabWidth": 4
+            }
+        ],
+        "comma-dangle": [
+            "error",
+            "always-multiline"
+        ],
+        "quotes": [
+            "error",
+            "single"
+        ],
+        "prettier/prettier": "off",
+        "react/prop-types": "off",
+        "@typescript-eslint/explicit-function-return-type": "off",
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/interface-name-prefix": "off",
+        "@typescript-eslint/no-empty-interface": "off",
+        "@typescript-eslint/member-delimiter-style": [
+            "error",
+            {
+                "multiline": {
+                    "delimiter": "semi", /* "none" or "semi" or "comma" */
+                    "requireLast": true
+                },
+                "singleline": {
+                    "delimiter": "comma",
+                    "requireLast": false
+                }
+            }
+        ]
     }
 }
