@@ -1,5 +1,5 @@
-import React, { Component, ReactElement } from 'react';
-import { Text, FlatList, ListRenderItemInfo, View, StyleSheet, ActivityIndicator } from 'react-native';
+import React, { Component } from 'react';
+import { Text, FlatList, ListRenderItemInfo, View, StyleSheet, RefreshControl } from 'react-native';
 import { BookService } from '../../services/book-service';
 import { Book } from 'src/models/book';
 import { BookItem } from '../elements/book-item.component';
@@ -11,7 +11,7 @@ interface IBookListScreenProps extends IStackNavigationProperties {
 
 interface IBookListScreenState {
     books: Book[];
-    listInitialElem: ReactElement;
+    loading: boolean;
 }
 
 export class BookListScreen extends Component<IBookListScreenProps, IBookListScreenState> {
@@ -19,7 +19,7 @@ export class BookListScreen extends Component<IBookListScreenProps, IBookListScr
         super(props);
         this.state = {
             books: [],
-            listInitialElem: this.generateEmptyListComponent(),
+            loading: false,
         };
         // this.props.navigation.addListener('focus', () => { this.tryLoadBooks(); });
     }
@@ -37,29 +37,11 @@ export class BookListScreen extends Component<IBookListScreenProps, IBookListScr
 
     private bookService = new BookService();
 
-    private generateEmptyListComponent(): ReactElement {
-        return (
-            <View style={this.styles.centeredContainer}>
-                <Text>No book here</Text>
-            </View>
-        );
-    }
-
-    private generateLoadingComponent(): ReactElement {
-        return (
-            <View style={this.styles.centeredContainer}>
-                <ActivityIndicator size="large" />
-            </View>
-        );
-    }
-
     private async tryLoadBooks() {
         if (this.props.dbReady) {
             console.log('try load books...');
-            let books: Book[] = [];
-            const oldListInitialElem = this.state.listInitialElem;
-            const listInitialElem = this.generateLoadingComponent();
-            this.setState({ ...this.state, books, listInitialElem });
+            let books: Book[] = this.state.books;
+            this.setState({ ...this.state, loading: true });
             try {
                 const [bs, count] = await this.bookService.getBooks(0, 500);
                 books = bs;
@@ -67,7 +49,7 @@ export class BookListScreen extends Component<IBookListScreenProps, IBookListScr
             } catch (e) {
                 console.log('Error happens while fetching books.', e);
             }
-            this.setState({ ...this.state, books, listInitialElem: oldListInitialElem });
+            this.setState({ ...this.state, books, loading: false });
         }
     }
 
@@ -93,7 +75,11 @@ export class BookListScreen extends Component<IBookListScreenProps, IBookListScr
         return (
             <FlatList
                 contentContainerStyle={this.styles.listContainer}
-                ListEmptyComponent={this.state.listInitialElem}
+                ListEmptyComponent={
+                    <View style={this.styles.centeredContainer}>
+                        <Text>No book here</Text>
+                    </View>
+                }
                 data={this.state.books}
                 renderItem={(info: ListRenderItemInfo<Book>) =>
                     <BookItem book={info.item} onDeleted={async (book: Book) => {
@@ -104,6 +90,10 @@ export class BookListScreen extends Component<IBookListScreenProps, IBookListScr
                         }
                     }} />}
                 keyExtractor={item => item.id?.toString() || 'never'}
+                refreshControl={<RefreshControl
+                    colors={['#9Bd35A', '#689F38']}
+                    refreshing={this.state.loading}
+                    onRefresh={() => { this.tryLoadBooks(); }} />}
             />
         );
     }
