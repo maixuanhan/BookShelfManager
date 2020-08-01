@@ -4,7 +4,7 @@ import { Text } from 'react-native';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
 import { BookScreen } from './screens/book-screen.component';
-import { DbReadyConsumer } from './elements/db-ready';
+import { DbReadyConsumer } from './elements/db-ready.context.component';
 
 const Drawer = createDrawerNavigator();
 

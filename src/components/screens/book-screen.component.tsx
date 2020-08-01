@@ -3,37 +3,15 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { BookListScreen } from './book-list-screen.component';
 import { BookAddScreen } from './book-add-screen.component';
 import { Button, StyleSheet, View } from 'react-native';
-import { DbReadyConsumer } from '../elements/db-ready';
-
-declare type DrawerNavigationProperties = {
-    navigation: {
-        addListener: Function,
-        canGoBack: Function,
-        closeDrawer: Function,
-        dangerouslyGetParent: Function,
-        dangerouslyGetState: Function,
-        dispatch: Function,
-        goBack: Function,
-        isFocused: Function,
-        jumpTo: Function,
-        navigate: Function,
-        openDrawer: Function,
-        removeListener: Function,
-        reset: Function,
-        setOptions: Function,
-        setParams: Function,
-        toggleDrawer: Function
-    },
-    route: {
-        key: string,
-        name: string,
-        params: any
-    }
-}
+import { DbReadyConsumer } from '../elements/db-ready.context.component';
+import { IDrawerNavigationProperties } from '../common/drawer-navigation-props.interface';
 
 const Stack = createStackNavigator();
 
-export class BookScreen extends Component<DrawerNavigationProperties> {
+interface IBookScreenProps extends IDrawerNavigationProperties {
+}
+
+export class BookScreen extends Component<IBookScreenProps> {
     private styles = StyleSheet.create({
         addBookView: {
             marginRight: 10,

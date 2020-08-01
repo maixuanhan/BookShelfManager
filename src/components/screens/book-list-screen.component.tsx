@@ -3,39 +3,10 @@ import { Text, FlatList, ListRenderItemInfo, View, StyleSheet, ActivityIndicator
 import { BookService } from '../../services/book-service';
 import { Book } from 'src/models/book';
 import { BookItem } from '../elements/book-item.component';
+import { IStackNavigationProperties } from '../common/stack-navigation-props.interface';
 
-interface IDrawerNavigationProperties {
-    navigation: {
-        addListener: Function,
-        canGoBack: Function,
-        closeDrawer: Function,
-        dangerouslyGetParent: Function,
-        dangerouslyGetState: Function,
-        dispatch: Function,
-        goBack: Function,
-        isFocused: Function,
-        jumpTo: Function,
-        navigate: Function,
-        openDrawer: Function,
-        pop: Function,
-        popToTop: Function,
-        push: Function,
-        removeListener: Function,
-        replace: Function,
-        reset: Function,
-        setOptions: Function,
-        setParams: Function,
-        toggleDrawer: Function
-    };
-    route: {
-        key: string,
-        name: string,
-        params: any
-    };
+interface IBookListScreenProps extends IStackNavigationProperties {
     dbReady: boolean;
-}
-
-interface IBookListScreenProps extends IDrawerNavigationProperties {
 }
 
 interface IBookListScreenState {

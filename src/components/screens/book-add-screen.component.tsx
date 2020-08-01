@@ -1,43 +1,15 @@
 import React, { Component } from 'react';
-import { Text, Button, StyleSheet, TextInput, View, FlatList } from 'react-native';
+import { Text, Button, StyleSheet, TextInput, View, FlatList, Modal, Alert, TouchableHighlight } from 'react-native';
 import { Book } from '../../models/book';
 import { BookService } from '../../services/book-service';
 import { searchTitle, IBookInfo } from '../../services/goodreads';
 import { AutoCompleteInput } from '../elements/auto-complete-input.component';
-import { BookAdditionalInfo } from 'src/models/book-additional-info';
-import { DbReadyConsumer } from '../elements/db-ready';
+import { BookAdditionalInfo } from '../../models/book-additional-info';
+import { DbReadyConsumer } from '../elements/db-ready.context.component';
+import { Validator } from '../../services/validator';
+import { IStackNavigationProperties } from '../common/stack-navigation-props.interface';
 
-interface IDrawerNavigationProperties {
-    navigation: {
-        addListener: Function,
-        canGoBack: Function,
-        closeDrawer: Function,
-        dangerouslyGetParent: Function,
-        dangerouslyGetState: Function,
-        dispatch: Function,
-        goBack: Function,
-        isFocused: Function,
-        jumpTo: Function,
-        navigate: Function,
-        openDrawer: Function,
-        pop: Function,
-        popToTop: Function,
-        push: Function,
-        removeListener: Function,
-        replace: Function,
-        reset: Function,
-        setOptions: Function,
-        setParams: Function,
-        toggleDrawer: Function
-    },
-    route: {
-        key: string,
-        name: string,
-        params: any
-    }
-}
-
-interface IBookAddScreenProps extends IDrawerNavigationProperties {
+interface IBookAddScreenProps extends IStackNavigationProperties {
 }
 
 interface IBookAddScreenState extends Partial<Book> {
@@ -53,7 +25,7 @@ export class BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreen
             title: '',
             authors: '',
             note: '',
-            quantity: 0,
+            quantity: 1,
             remark: '',
         };
     }
@@ -104,6 +76,13 @@ export class BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreen
         if (dbReady && !this.updating) {
             this.updating = true;
             try {
+                const validationResult = new Validator([
+                    { validator: (title) => title, data: [this.state.title], failMessage: 'Title must not be empty' },
+                    { validator: (quantity) => quantity > 0, data: [this.state.quantity], failMessage: 'You must own at least 1 book' },
+                ]).validate();
+                if (!validationResult.ok) {
+                    throw new Error(validationResult.message);
+                }
                 const book: Partial<Book> = {
                     title: this.state.title || '',
                     authors: this.state.authors || '',
@@ -116,7 +95,8 @@ export class BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreen
                 this.props.navigation.navigate("book.list", { new: book });
             } catch (e) {
                 this.updating = false;
-                console.log("Something went wrong while adding book", e);
+                // console.log("Error while adding book:", e);
+                Alert.alert(`Cannot add book: ${e.message}`);
             }
         } else if (this.updating) {
             console.log("Book is updating");
