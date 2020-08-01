@@ -52,9 +52,6 @@ export class BookItem extends Component<IBookItemProps, IBookItemState> {
             flexDirection: 'column',
             alignContent: 'space-around',
         },
-        textTitle: {
-            // flex: 1,
-        },
         textAuthors: {
             color: '#a0a0ac',
         },
@@ -85,7 +82,7 @@ export class BookItem extends Component<IBookItemProps, IBookItemState> {
                         <View style={this.styles.itemImage}></View>
                     }
                     <View style={this.styles.itemText}>
-                        <Text style={this.styles.textTitle}>{this.props.book.title}</Text>
+                        <Text>{this.props.book.title}</Text>
                         <Text style={this.styles.textAuthors}>{this.props.book.authors}</Text>
                     </View>
                 </View>

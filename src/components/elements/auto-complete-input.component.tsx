@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import { Text, StyleSheet, TextInput, View, StyleProp, TextStyle, ScrollView, TouchableOpacity, Image } from 'react-native';
+import {
+    Text, StyleSheet, TextInput, View, StyleProp, TextStyle, TouchableOpacity, Image, FlatList,
+} from 'react-native';
 
 type StringProperties<T> = Pick<T, {
     [K in keyof T]: T[K] extends string | undefined ? K : never
@@ -9,50 +11,38 @@ interface IAutoCompleteInputProps<T> {
     textInputStyle?: StyleProp<TextStyle>;
     onTextChanged?: (text: string) => any;
     onItemSelected?: (item: T) => any;
+    idMember: keyof T;
     textMember: keyof StringProperties<T>;
+    secondaryTextMember?: keyof StringProperties<T>;
     imageMember?: keyof StringProperties<T>;
     data: T[];
 }
 
-interface IAutoCompleteInputState {
+interface IAutoCompleteInputState<T> {
     value: string;
-    showList: boolean;
-    listStyle: any;
+    data: T[];
 }
 
-export class AutoCompleteInput<T> extends Component<IAutoCompleteInputProps<T>, IAutoCompleteInputState> {
+export class AutoCompleteInput<T> extends Component<IAutoCompleteInputProps<T>, IAutoCompleteInputState<T>> {
     constructor(props: IAutoCompleteInputProps<T>) {
         super(props);
         this.state = {
             value: '',
-            showList: true,
-            listStyle: this.makeListStyle(100, 50),
+            data: this.props.data,
         };
     }
 
-    private makeListStyle(top: number, width: number) {
-        return StyleSheet.create({
-            list: {
-                position: 'absolute',
-                backgroundColor: 'white',
-                zIndex: 100,
-                top,
-                width,
-                borderColor: '#afafaf',
-                borderStyle: 'solid',
-                borderWidth: 1,
-                padding: 5,
-                height: 320,
-            }
-        }).list;
-    }
 
-    private defaultStyle = StyleSheet.create({
+    private styles = StyleSheet.create({
         container: {
-            position: 'relative',
+            marginBottom: 10,
+        },
+        headerContainer: {
+            marginBottom: -10,
         },
         item: {
             flexDirection: 'row',
+            backgroundColor: '#fff',
             padding: 5,
         },
         itemImage: {
@@ -63,54 +53,64 @@ export class AutoCompleteInput<T> extends Component<IAutoCompleteInputProps<T>, 
             flex: 1,
             padding: 5,
         },
+        secondaryText: {
+            color: '#a0a0ac',
+        },
     });
 
     private onItemSelected(item: T) {
-        this.setState({ ...this.state, value: String(item[this.props.textMember]), showList: false });
+        this.setState({ ...this.state, value: String(item[this.props.textMember]), data: [] });
         if (this.props.onItemSelected) { this.props.onItemSelected(item); }
     }
 
     componentDidUpdate(prevProps: Readonly<IAutoCompleteInputProps<T>>) {
         if (prevProps.data != this.props.data) {
-            this.setState({ ...this.state, showList: true });
+            this.setState({ ...this.state, data: this.props.data });
         }
     }
 
     render() {
         return (
-            <View style={this.defaultStyle.container}>
-                <TextInput
-                    style={this.props.textInputStyle}
-                    onChangeText={(text) => {
-                        this.setState({ ...this.state, value: text });
-                        if (this.props.onTextChanged) {
-                            this.props.onTextChanged(text);
-                        }
-                    }}
-                    onLayout={e => {
-                        // console.log(e);
-                        this.setState({ ...this.state, listStyle: this.makeListStyle(e.nativeEvent.layout.height, e.nativeEvent.layout.width) });
-                    }}
-                    value={this.state.value} />
-                {this.state.showList && this.props.data.length ?
-                    <ScrollView style={this.state.listStyle}>
-                        {this.props.data.map((entry, i) => (
-                            <TouchableOpacity key={i} onPress={() => { this.onItemSelected(entry); }}>
-                                <View style={this.defaultStyle.item}>
-                                    {this.props.imageMember ?
-                                        <Image style={this.defaultStyle.itemImage} source={{ uri: String(entry[this.props.imageMember]) }} /> :
-                                        <></>
-                                    }
-                                    <View style={this.defaultStyle.itemText}>
-                                        <Text>{entry[this.props.textMember]}</Text>
-                                    </View>
-                                </View>
-                            </TouchableOpacity>
-                        ))}
-                    </ScrollView>
-                    : <></>
+            <FlatList
+                style={this.styles.container}
+                stickyHeaderIndices={[0]}
+                ListHeaderComponentStyle={this.styles.headerContainer}
+                data={this.state.data}
+                keyExtractor={item => `${item[this.props.idMember]}`}
+                ListHeaderComponent={
+                    <TextInput
+                        style={this.props.textInputStyle}
+                        onChangeText={(text) => {
+                            this.setState({ ...this.state, value: text });
+                            if (this.props.onTextChanged) {
+                                this.props.onTextChanged(text);
+                            }
+                        }}
+                        value={this.state.value}
+                    />
                 }
-            </View>
+                renderItem={(props) => (
+                    <TouchableOpacity key={props.index} onPress={() => { this.onItemSelected(props.item); }}>
+                        <View style={this.styles.item}>
+                            {this.props.imageMember ?
+                                <Image
+                                    style={this.styles.itemImage}
+                                    source={{ uri: String(props.item[this.props.imageMember]) }}
+                                /> : <></>
+                            }
+                            <View style={this.styles.itemText}>
+                                <Text>{props.item[this.props.textMember]}</Text>
+                                {this.props.secondaryTextMember ?
+                                    <Text style={this.styles.secondaryText}>
+                                        {props.item[this.props.secondaryTextMember]}
+                                    </Text>
+                                    : <></>
+                                }
+                            </View>
+                        </View>
+                    </TouchableOpacity>
+                )}
+            />
         );
     }
 }
