@@ -33,7 +33,7 @@ export class BookScreen extends Component<IBookScreenProps> {
                                     />
                                 </View>
                             ),
-                        }} component={(props) => <BookListScreen {...props} dbReady={dbReady} />} />
+                        }}>{(props: any) => (<BookListScreen {...props} dbReady={dbReady} />)}</Stack.Screen>
                         <Stack.Screen name="book.add" component={BookAddScreen} options={{ title: 'Add new book' }} />
                         <Stack.Screen name="book.assignlabels" component={BookAssignLabelScreen}
                             options={{ title: 'Assign labels' }} />

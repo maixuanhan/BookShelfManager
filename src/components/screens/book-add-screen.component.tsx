@@ -174,7 +174,7 @@ export class BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreen
                                 }} />
                                 <TouchableOpacity onPress={() => {
                                     console.log('WORK!');
-                                    this.props.navigation.openDrawer();
+                                    this.props.navigation.navigate('book.assignlabels');
                                 }}>
                                     <Text style={this.styles.linkForm}>Labels</Text>
                                 </TouchableOpacity>

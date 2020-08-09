@@ -131,7 +131,8 @@ export class BookAssignLabelScreen extends Component<IBookAssignLabelScreenProps
                                 <View style={this.styles.inputView}>
                                     <TextInput
                                         style={this.styles.inputForm}
-                                        // value={}
+                                        value={this.state.labels.length && this.state.labels[0].editing ?
+                                            this.state.labels[0].label.name : ''}
                                         onChangeText={text => {
                                             this.filter(text);
                                         }}
