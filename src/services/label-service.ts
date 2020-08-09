@@ -13,4 +13,8 @@ export class LabelService {
     public async updateLabel(label: Label): Promise<Label> {
         return label.save();
     }
+
+    public getAllLabels(): Promise<Label[]> {
+        return Label.find({});
+    }
 }

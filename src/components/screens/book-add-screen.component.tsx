@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, Button, StyleSheet, TextInput, View, FlatList, Alert } from 'react-native';
+import { Text, Button, StyleSheet, TextInput, View, FlatList, Alert, TouchableOpacity } from 'react-native';
 import { Book } from '../../models/book';
 import { BookService } from '../../services/book-service';
 import { searchTitle, IBookInfo } from '../../services/goodreads';
@@ -52,6 +52,11 @@ export class BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreen
             borderRadius: 4,
             height: 38,
             fontSize: 16,
+        },
+        linkForm: {
+            color: 'blue',
+            textDecorationLine: 'underline',
+            textDecorationColor: 'blue',
         },
         inputView: {
             flex: 1,
@@ -167,6 +172,12 @@ export class BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreen
                                 <TextInput style={this.styles.inputForm} value={this.state.note} onChangeText={text => {
                                     this.setState({ ...this.state, note: text });
                                 }} />
+                                <TouchableOpacity onPress={() => {
+                                    console.log('WORK!');
+                                    this.props.navigation.openDrawer();
+                                }}>
+                                    <Text style={this.styles.linkForm}>Labels</Text>
+                                </TouchableOpacity>
                                 {this.state.additionalInfo?.goodReadsId ?
                                     <Text>Goodreads ID: {this.state.additionalInfo.goodReadsId}</Text> :
                                     <></>}

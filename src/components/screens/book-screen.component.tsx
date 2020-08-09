@@ -5,6 +5,7 @@ import { BookAddScreen } from './book-add-screen.component';
 import { Button, StyleSheet, View } from 'react-native';
 import { DbReadyConsumer } from '../elements/db-ready.context.component';
 import { IDrawerNavigationProperties } from '../common/drawer-navigation-props.interface';
+import { BookAssignLabelScreen } from './book-assign-label-screen.component';
 
 const Stack = createStackNavigator();
 
@@ -24,20 +25,18 @@ export class BookScreen extends Component<IBookScreenProps> {
                     <Stack.Navigator initialRouteName="book.list" headerMode="screen">
                         <Stack.Screen name="book.list" options={{
                             title: 'Book list',
-                            headerRight: () => {
-                                return (
-                                    <View style={this.styles.addBookView}>
-                                        <Button
-                                            title="Add book"
-                                            onPress={() => { this.props.navigation.navigate('book.add'); }}
-                                        />
-                                    </View>
-                                );
-                            },
-                        }} >
-                            {(props) => <BookListScreen {...props} dbReady={dbReady} />}
-                        </Stack.Screen>
+                            headerRight: () => (
+                                <View style={this.styles.addBookView}>
+                                    <Button
+                                        title="Add book"
+                                        onPress={() => { this.props.navigation.navigate('book.add'); }}
+                                    />
+                                </View>
+                            ),
+                        }} component={(props) => <BookListScreen {...props} dbReady={dbReady} />} />
                         <Stack.Screen name="book.add" component={BookAddScreen} options={{ title: 'Add new book' }} />
+                        <Stack.Screen name="book.assignlabels" component={BookAssignLabelScreen}
+                            options={{ title: 'Assign labels' }} />
                     </Stack.Navigator>
                 )}
             </DbReadyConsumer>
