@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, Button, StyleSheet, TextInput, View, FlatList, Alert, TouchableOpacity } from 'react-native';
+import { Text, Button, StyleSheet, TextInput, View, FlatList, Alert, Pressable } from 'react-native';
 import { Book } from '../../models/book';
 import { BookService } from '../../services/book-service';
 import { searchTitle, IBookInfo } from '../../services/goodreads';
@@ -7,6 +7,8 @@ import { AutoCompleteInput } from '../elements/auto-complete-input.component';
 import { BookAdditionalInfo } from '../../models/book-additional-info';
 import { Validator } from '../../services/validator';
 import { IStackNavigationProperties } from '../common/stack-navigation-props.interface';
+import { LabelService } from '../../services/label-service';
+import { Label } from '../../models/label';
 
 interface IBookAddScreenProps extends IStackNavigationProperties {
     dbReady: boolean;
@@ -15,6 +17,7 @@ interface IBookAddScreenProps extends IStackNavigationProperties {
 interface IBookAddScreenState extends Partial<Book> {
     autoCompleteBooks: IBookInfo[];
     additionalInfo?: BookAdditionalInfo;
+    labels: Label[];
 }
 
 export class BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreenState> {
@@ -22,6 +25,7 @@ export class BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreen
         super(props);
         this.state = {
             autoCompleteBooks: [],
+            labels: [],
             title: '',
             authors: '',
             note: '',
@@ -31,6 +35,7 @@ export class BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreen
     }
 
     private bookService = new BookService();
+    private labelService = new LabelService();
     private updating = false;
 
     private styles = StyleSheet.create({
@@ -54,9 +59,24 @@ export class BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreen
             fontSize: 16,
         },
         linkForm: {
+            marginTop: 6,
+            marginRight: 8,
+            fontSize: 16,
             color: 'blue',
             textDecorationLine: 'underline',
             textDecorationColor: 'blue',
+        },
+        bookLabelView: {
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+        },
+        bookLabelItem: {
+            margin: 4,
+            padding: 4,
+            borderRadius: 4,
+            backgroundColor: '#e0e0e0',
+        },
+        bookLabelItemText: {
         },
         inputView: {
             flex: 1,
@@ -101,8 +121,8 @@ export class BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreen
                     note: this.state.note,
                     remark: JSON.stringify(this.state.additionalInfo),
                 };
-                const result = await this.bookService.addBook(book);
-                book.id = result.id;
+                const result = await this.bookService.addBook(book, this.state.labels);
+                book.id = result.id; // to fix junk members from typeorm
                 this.props.navigation.navigate('book.list', { new: book });
             } catch (e) {
                 this.updating = false;
@@ -124,7 +144,17 @@ export class BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreen
         }
     }
 
-    render() {
+    public async componentDidUpdate(prevProps: IBookAddScreenProps) {
+        console.log('PARAMS:', this.props.route?.params);
+        if (this.props.route?.params?.ids && this.props.route?.params?.ids !== prevProps.route?.params?.ids) {
+            const labelIds: number[] = [...this.props.route?.params?.ids];
+            const labels = await this.labelService.getLabelsByIds(labelIds);
+            this.setState({ ...this.state, labels });
+        }
+    }
+
+    public render() {
+        const { labels } = this.state;
         return (
             <FlatList
                 data={[1]}
@@ -170,12 +200,18 @@ export class BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreen
                         <TextInput style={this.styles.inputForm} value={this.state.note} onChangeText={text => {
                             this.setState({ ...this.state, note: text });
                         }} />
-                        <TouchableOpacity onPress={() => {
-                            console.log('WORK!');
-                            this.props.navigation.navigate('book.assignlabels');
-                        }}>
-                            <Text style={this.styles.linkForm}>Labels</Text>
-                        </TouchableOpacity>
+                        <View style={this.styles.bookLabelView}>
+                            <Pressable onPress={() => {
+                                this.props.navigation.navigate('book.assignlabels', { ids: labels.map(l => l.id) });
+                            }}>
+                                <Text style={this.styles.linkForm}>Labels</Text>
+                            </Pressable >
+                            {labels.map(l => (
+                                <View key={l.id} style={this.styles.bookLabelItem}>
+                                    <Text style={this.styles.bookLabelItemText}>{l.name}</Text>
+                                </View>
+                            ))}
+                        </View>
                         {this.state.additionalInfo?.goodReadsId ?
                             <Text>Goodreads ID: {this.state.additionalInfo.goodReadsId}</Text> :
                             <></>}
@@ -185,7 +221,7 @@ export class BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreen
                     <View style={this.styles.buttonView}>
                         <View style={this.styles.wrapButtonView}>
                             <Button color={this.styles.saveButton.backgroundColor} title="Save"
-                                onPress={() => { this.addBook(); }} />
+                                onPress={() => this.addBook()} />
                         </View>
                         <View style={this.styles.wrapButtonView}>
                             <Button color={this.styles.cancelButton.backgroundColor} title="Cancel"

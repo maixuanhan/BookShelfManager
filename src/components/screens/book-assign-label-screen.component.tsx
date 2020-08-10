@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
-import { Text, Button, StyleSheet, TextInput, View, FlatList, TouchableOpacity } from 'react-native';
+import { Text, Button, StyleSheet, TextInput, View, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { IStackNavigationProperties } from '../common/stack-navigation-props.interface';
 import { Label } from '../../models/label';
 import { LabelService } from '../../services/label-service';
+import CheckBox from '@react-native-community/checkbox';
 
 interface ILabelSelection {
     label: Label;
     selected: boolean;
-    new: boolean;
+    isNew: boolean;
     editing: boolean;
     displayed: boolean;
 }
@@ -23,11 +24,11 @@ interface IBookAssignLabelScreenState {
 
 export class BookAssignLabelScreen extends Component<IBookAssignLabelScreenProps, IBookAssignLabelScreenState> {
     private loaded = false;
+    private processing = false;
     private labelService = new LabelService();
     private styles = StyleSheet.create({
         view: {
             flexGrow: 1,
-            alignItems: 'flex-start',
             justifyContent: 'flex-start',
             padding: 10,
         },
@@ -42,7 +43,7 @@ export class BookAssignLabelScreen extends Component<IBookAssignLabelScreenProps
             fontSize: 16,
         },
         inputView: {
-            marginBottom: 10,
+            marginBottom: 2,
         },
         buttonView: {
             flexDirection: 'row-reverse',
@@ -58,9 +59,23 @@ export class BookAssignLabelScreen extends Component<IBookAssignLabelScreenProps
             backgroundColor: '#6c757d',
         },
         itemView: {
-            backgroundColor: 'cyan',
             height: 70,
-        }
+            flexDirection: 'row-reverse',
+        },
+        itemTextView: {
+            flex: 1,
+            marginLeft: 8,
+            justifyContent: 'center',
+        },
+        itemCheckboxView: {
+            margin: 8,
+            justifyContent: 'center',
+        },
+        itemSeparator: {
+            height: 1,
+            width: "100%",
+            backgroundColor: "#ced0ce",
+        },
     });
 
     constructor(props: IBookAssignLabelScreenProps) {
@@ -75,9 +90,9 @@ export class BookAssignLabelScreen extends Component<IBookAssignLabelScreenProps
         if (!this.props.dbReady || this.loaded) { return; }
         const labelInfos = await this.labelService.getAllLabels();
         const labelIds: number[] = this.props.route.params?.ids || [];
-        const newLabels: string[] = this.props.route.params?.new || [];
+        const newLabels: string[] = this.props.route.params?.news || [];
         const labels: ILabelSelection[] = labelInfos.map(label => ({
-            label, new: false, editing: false, displayed: true,
+            label, isNew: false, editing: false, displayed: true,
             selected: (labelIds.indexOf(label.id) > -1),
         }));
         newLabels.forEach(name => {
@@ -87,7 +102,7 @@ export class BookAssignLabelScreen extends Component<IBookAssignLabelScreenProps
             } else {
                 labels.push({
                     label: new Label(undefined, name),
-                    new: true,
+                    isNew: true,
                     selected: true,
                     editing: false,
                     displayed: true,
@@ -107,7 +122,7 @@ export class BookAssignLabelScreen extends Component<IBookAssignLabelScreenProps
                 labels.unshift({
                     label: new Label(undefined, text),
                     editing: true,
-                    new: true,
+                    isNew: true,
                     selected: false,
                     displayed: true,
                 });
@@ -117,8 +132,38 @@ export class BookAssignLabelScreen extends Component<IBookAssignLabelScreenProps
         this.setState({ ...this.state, labels, query: text });
     }
 
+    private async onDone() {
+        if (this.processing) {
+            return;
+        }
+        this.processing = true;
+        try {
+            const ids: number[] = this.state.labels.filter(r => r.selected && !r.isNew && r.label.id)
+                .map(r => r.label.id);
+            const news: string[] = this.state.labels.filter(r => r.selected && r.isNew).map(r => r.label.name);
+            if (!this.props.dbReady && news.length) {
+                throw new Error('Database is not ready yet');
+            }
+            const labels = await Promise.all(news.map(name => this.labelService.addLabel(name)));
+            if (labels.length) {
+                ids.push(...labels.map(l => l.id));
+            }
+
+            this.props.navigation.navigate('book.add', { ids });
+        } catch (e) {
+            this.processing = false;
+            Alert.alert(`Cannot assign labels: ${e.message}`);
+        }
+    }
+
+    public componentDidMount() {
+        if (this.props.dbReady) {
+            this.initializeList();
+        }
+    }
+
     public componentDidUpdate(prevProps: IBookAssignLabelScreenProps) {
-        if (this.props.dbReady && !prevProps.dbReady) {
+        if (this.props.dbReady && this.props.dbReady !== prevProps?.dbReady) {
             this.initializeList();
         }
     }
@@ -138,16 +183,27 @@ export class BookAssignLabelScreen extends Component<IBookAssignLabelScreenProps
                     data={labels}
                     keyExtractor={item => item.label.name}
                     contentContainerStyle={this.styles.view}
+                    ItemSeparatorComponent={() => <View style={this.styles.itemSeparator} />}
                     renderItem={({ item }) => (
                         <TouchableOpacity onPress={() => {
                             item.selected = !item.selected;
                             if (item.editing) {
                                 item.editing = false;
                                 this.filter('');
+                            } else {
+                                this.setState({ ...this.state });
                             }
                         }}>
                             <View style={this.styles.itemView}>
-                                <Text>{item.label.name}</Text>
+                                <View style={this.styles.itemCheckboxView}>
+                                    <CheckBox value={item.selected} onValueChange={(checked: boolean) => {
+                                        item.selected = checked;
+                                        this.setState({ ...this.state });
+                                    }} />
+                                </View>
+                                <View style={this.styles.itemTextView}>
+                                    <Text>{item.label.name}</Text>
+                                </View>
                             </View>
                         </TouchableOpacity>
                     )}
@@ -155,7 +211,7 @@ export class BookAssignLabelScreen extends Component<IBookAssignLabelScreenProps
                         <View style={this.styles.buttonView}>
                             <View style={this.styles.wrapButtonView}>
                                 <Button color={this.styles.saveButton.backgroundColor} title="Done"
-                                    onPress={() => { console.log(this.state.labels); }} />
+                                    onPress={() => { this.onDone(); }} />
                             </View>
                             <View style={this.styles.wrapButtonView}>
                                 <Button color={this.styles.cancelButton.backgroundColor} title="Cancel"

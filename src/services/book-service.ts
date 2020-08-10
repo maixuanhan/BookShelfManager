@@ -15,11 +15,6 @@ export class BookService {
     public async addBook(info: Partial<Book>, labels?: Label[]): Promise<Book> {
         const book = new Book(undefined, info.title, info.authors, info.quantity, info.note, info.remark);
         if (labels) {
-            for (const label of labels) {
-                if (!label.id) {
-                    await label.save();
-                }
-            }
             book.labels = labels;
         }
         return book.save();
