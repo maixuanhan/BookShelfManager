@@ -34,9 +34,12 @@ export class BookScreen extends Component<IBookScreenProps> {
                                 </View>
                             ),
                         }}>{(props: any) => (<BookListScreen {...props} dbReady={dbReady} />)}</Stack.Screen>
-                        <Stack.Screen name="book.add" component={BookAddScreen} options={{ title: 'Add new book' }} />
-                        <Stack.Screen name="book.assignlabels" component={BookAssignLabelScreen}
-                            options={{ title: 'Assign labels' }} />
+                        <Stack.Screen name="book.add" options={{
+                            title: 'Add new book',
+                        }}>{(props: any) => (<BookAddScreen {...props} dbReady={dbReady} />)}</Stack.Screen>
+                        <Stack.Screen name="book.assignlabels" options={{
+                            title: 'Assign labels',
+                        }}>{(props: any) => (<BookAssignLabelScreen {...props} dbReady={dbReady} />)}</Stack.Screen>
                     </Stack.Navigator>
                 )}
             </DbReadyConsumer>

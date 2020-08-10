@@ -5,11 +5,11 @@ import { BookService } from '../../services/book-service';
 import { searchTitle, IBookInfo } from '../../services/goodreads';
 import { AutoCompleteInput } from '../elements/auto-complete-input.component';
 import { BookAdditionalInfo } from '../../models/book-additional-info';
-import { DbReadyConsumer } from '../elements/db-ready.context.component';
 import { Validator } from '../../services/validator';
 import { IStackNavigationProperties } from '../common/stack-navigation-props.interface';
 
 interface IBookAddScreenProps extends IStackNavigationProperties {
+    dbReady: boolean;
 }
 
 interface IBookAddScreenState extends Partial<Book> {
@@ -77,8 +77,8 @@ export class BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreen
         },
     });
 
-    private async addBook(dbReady: boolean) {
-        if (dbReady && !this.updating) {
+    private async addBook() {
+        if (this.props.dbReady && !this.updating) {
             this.updating = true;
             try {
                 const validationResult = new Validator([
@@ -126,78 +126,74 @@ export class BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreen
 
     render() {
         return (
-            <DbReadyConsumer>
-                {({ dbReady }) => (
-                    <FlatList
-                        data={[1]}
-                        keyExtractor={item => item.toString()}
-                        contentContainerStyle={this.styles.view}
-                        renderItem={() => (
-                            <View style={this.styles.inputView}>
-                                <Text style={this.styles.labelForm}>Title</Text>
-                                <AutoCompleteInput<IBookInfo>
-                                    data={this.state.autoCompleteBooks}
-                                    idMember="id"
-                                    textMember="title"
-                                    secondaryTextMember="author"
-                                    imageMember="thumbnailUrl"
-                                    textInputStyle={this.styles.inputForm}
-                                    onTextChanged={this.onTitleChanged.bind(this)}
-                                    onItemSelected={(item) => {
-                                        const additionalInfo = this.state.additionalInfo || {};
-                                        additionalInfo.goodReadsId = item.id;
-                                        additionalInfo.imageUrl = item.imageUrl;
-                                        additionalInfo.thumbnailUrl = item.thumbnailUrl;
-                                        this.setState({
-                                            ...this.state, title: item.title, authors: item.author, additionalInfo,
-                                        });
-                                    }} />
-                                <Text style={this.styles.labelForm}>Authors</Text>
-                                <TextInput
-                                    style={this.styles.inputForm}
-                                    value={this.state.authors}
-                                    onChangeText={text => {
-                                        this.setState({ ...this.state, authors: text });
-                                    }}
-                                />
-                                <Text style={this.styles.labelForm}>Quantity</Text>
-                                <TextInput
-                                    style={this.styles.inputForm}
-                                    keyboardType="numeric"
-                                    value={this.state.quantity?.toString()}
-                                    onChangeText={text => {
-                                        this.setState({ ...this.state, quantity: Number(text) });
-                                    }} />
-                                <Text style={this.styles.labelForm}>Note</Text>
-                                <TextInput style={this.styles.inputForm} value={this.state.note} onChangeText={text => {
-                                    this.setState({ ...this.state, note: text });
-                                }} />
-                                <TouchableOpacity onPress={() => {
-                                    console.log('WORK!');
-                                    this.props.navigation.navigate('book.assignlabels');
-                                }}>
-                                    <Text style={this.styles.linkForm}>Labels</Text>
-                                </TouchableOpacity>
-                                {this.state.additionalInfo?.goodReadsId ?
-                                    <Text>Goodreads ID: {this.state.additionalInfo.goodReadsId}</Text> :
-                                    <></>}
-                            </View>
-                        )}
-                        ListFooterComponent={
-                            <View style={this.styles.buttonView}>
-                                <View style={this.styles.wrapButtonView}>
-                                    <Button color={this.styles.saveButton.backgroundColor} title="Save"
-                                        onPress={() => { this.addBook(dbReady); }} />
-                                </View>
-                                <View style={this.styles.wrapButtonView}>
-                                    <Button color={this.styles.cancelButton.backgroundColor} title="Cancel"
-                                        onPress={() => { this.props.navigation.navigate('book.list'); }} />
-                                </View>
-                            </View>
-                        }
-                    />
+            <FlatList
+                data={[1]}
+                keyExtractor={item => item.toString()}
+                contentContainerStyle={this.styles.view}
+                renderItem={() => (
+                    <View style={this.styles.inputView}>
+                        <Text style={this.styles.labelForm}>Title</Text>
+                        <AutoCompleteInput<IBookInfo>
+                            data={this.state.autoCompleteBooks}
+                            idMember="id"
+                            textMember="title"
+                            secondaryTextMember="author"
+                            imageMember="thumbnailUrl"
+                            textInputStyle={this.styles.inputForm}
+                            onTextChanged={this.onTitleChanged.bind(this)}
+                            onItemSelected={(item) => {
+                                const additionalInfo = this.state.additionalInfo || {};
+                                additionalInfo.goodReadsId = item.id;
+                                additionalInfo.imageUrl = item.imageUrl;
+                                additionalInfo.thumbnailUrl = item.thumbnailUrl;
+                                this.setState({
+                                    ...this.state, title: item.title, authors: item.author, additionalInfo,
+                                });
+                            }} />
+                        <Text style={this.styles.labelForm}>Authors</Text>
+                        <TextInput
+                            style={this.styles.inputForm}
+                            value={this.state.authors}
+                            onChangeText={text => {
+                                this.setState({ ...this.state, authors: text });
+                            }}
+                        />
+                        <Text style={this.styles.labelForm}>Quantity</Text>
+                        <TextInput
+                            style={this.styles.inputForm}
+                            keyboardType="numeric"
+                            value={this.state.quantity?.toString()}
+                            onChangeText={text => {
+                                this.setState({ ...this.state, quantity: Number(text) });
+                            }} />
+                        <Text style={this.styles.labelForm}>Note</Text>
+                        <TextInput style={this.styles.inputForm} value={this.state.note} onChangeText={text => {
+                            this.setState({ ...this.state, note: text });
+                        }} />
+                        <TouchableOpacity onPress={() => {
+                            console.log('WORK!');
+                            this.props.navigation.navigate('book.assignlabels');
+                        }}>
+                            <Text style={this.styles.linkForm}>Labels</Text>
+                        </TouchableOpacity>
+                        {this.state.additionalInfo?.goodReadsId ?
+                            <Text>Goodreads ID: {this.state.additionalInfo.goodReadsId}</Text> :
+                            <></>}
+                    </View>
                 )}
-            </DbReadyConsumer>
+                ListFooterComponent={
+                    <View style={this.styles.buttonView}>
+                        <View style={this.styles.wrapButtonView}>
+                            <Button color={this.styles.saveButton.backgroundColor} title="Save"
+                                onPress={() => { this.addBook(); }} />
+                        </View>
+                        <View style={this.styles.wrapButtonView}>
+                            <Button color={this.styles.cancelButton.backgroundColor} title="Cancel"
+                                onPress={() => { this.props.navigation.navigate('book.list'); }} />
+                        </View>
+                    </View>
+                }
+            />
         );
     }
 }

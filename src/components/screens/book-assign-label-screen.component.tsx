@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Text, Button, StyleSheet, TextInput, View, FlatList, TouchableOpacity } from 'react-native';
-import { DbReadyConsumer } from '../elements/db-ready.context.component';
 import { IStackNavigationProperties } from '../common/stack-navigation-props.interface';
 import { Label } from '../../models/label';
 import { LabelService } from '../../services/label-service';
@@ -14,6 +13,7 @@ interface ILabelSelection {
 }
 
 interface IBookAssignLabelScreenProps extends IStackNavigationProperties {
+    dbReady: boolean;
 }
 
 interface IBookAssignLabelScreenState {
@@ -21,6 +21,47 @@ interface IBookAssignLabelScreenState {
 }
 
 export class BookAssignLabelScreen extends Component<IBookAssignLabelScreenProps, IBookAssignLabelScreenState> {
+    private loaded = false;
+    private labelService = new LabelService();
+    private styles = StyleSheet.create({
+        view: {
+            flexGrow: 1,
+            justifyContent: 'space-between',
+            padding: 10,
+        },
+        labelForm: {
+            marginBottom: 4,
+            fontSize: 16,
+        },
+        inputForm: {
+            marginBottom: 12,
+            backgroundColor: '#fff',
+            borderColor: '#ced4da',
+            borderStyle: 'solid',
+            borderWidth: 1,
+            borderRadius: 4,
+            height: 38,
+            fontSize: 16,
+        },
+        inputView: {
+            flex: 1,
+            marginBottom: 10,
+        },
+        buttonView: {
+            flexDirection: 'row-reverse',
+        },
+        wrapButtonView: {
+            flex: 1,
+            margin: 5,
+        },
+        saveButton: {
+            backgroundColor: '#007bff',
+        },
+        cancelButton: {
+            backgroundColor: '#6c757d',
+        },
+    });
+
     constructor(props: IBookAssignLabelScreenProps) {
         super(props);
         this.state = {
@@ -28,11 +69,8 @@ export class BookAssignLabelScreen extends Component<IBookAssignLabelScreenProps
         };
     }
 
-    private loaded = false;
-    private labelService = new LabelService();
-
-    private async tryInitializeList(dbReady: boolean): Promise<void> {
-        if (!dbReady || this.loaded) { return; }
+    private async initializeList(): Promise<void> {
+        if (!this.props.dbReady || this.loaded) { return; }
         const labelInfos = await this.labelService.getAllLabels();
         const labelIds: number[] = this.props.route.params?.ids || [];
         const newLabels: string[] = this.props.route.params?.new || [];
@@ -77,95 +115,55 @@ export class BookAssignLabelScreen extends Component<IBookAssignLabelScreenProps
         this.setState({ ...this.state, labels });
     }
 
-    private styles = StyleSheet.create({
-        view: {
-            flexGrow: 1,
-            justifyContent: 'space-between',
-            padding: 10,
-        },
-        labelForm: {
-            marginBottom: 4,
-            fontSize: 16,
-        },
-        inputForm: {
-            marginBottom: 12,
-            backgroundColor: '#fff',
-            borderColor: '#ced4da',
-            borderStyle: 'solid',
-            borderWidth: 1,
-            borderRadius: 4,
-            height: 38,
-            fontSize: 16,
-        },
-        inputView: {
-            flex: 1,
-            marginBottom: 10,
-        },
-        buttonView: {
-            flexDirection: 'row-reverse',
-        },
-        wrapButtonView: {
-            flex: 1,
-            margin: 5,
-        },
-        saveButton: {
-            backgroundColor: '#007bff',
-        },
-        cancelButton: {
-            backgroundColor: '#6c757d',
-        },
-    });
+    public componentDidUpdate(prevProps: IBookAssignLabelScreenProps) {
+        if (this.props.dbReady && !prevProps.dbReady) {
+            this.initializeList();
+        }
+    }
 
-    render() {
+    public render() {
+        const labels = this.state.labels.filter(r => r.displayed);
         return (
-            <DbReadyConsumer>
-                {({ dbReady }) => {
-                    this.tryInitializeList(dbReady);
-                    const labels = this.state.labels.filter(r => r.displayed);
-                    return (
-                        <FlatList
-                            data={labels}
-                            keyExtractor={item => item.label.name}
-                            contentContainerStyle={this.styles.view}
-                            ListHeaderComponent={() => (
-                                <View style={this.styles.inputView}>
-                                    <TextInput
-                                        style={this.styles.inputForm}
-                                        value={this.state.labels.length && this.state.labels[0].editing ?
-                                            this.state.labels[0].label.name : ''}
-                                        onChangeText={text => {
-                                            this.filter(text);
-                                        }}
-                                    />
-                                </View>
-                            )}
-                            renderItem={({ item }) => (
-                                <TouchableOpacity onPress={() => {
-                                    item.editing = false;
-                                    item.selected = true;
-                                    this.setState({ ...this.state });
-                                }}>
-                                    <View>
-                                        <Text>{item.label.name}</Text>
-                                    </View>
-                                </TouchableOpacity>
-                            )}
-                            ListFooterComponent={
-                                <View style={this.styles.buttonView}>
-                                    <View style={this.styles.wrapButtonView}>
-                                        <Button color={this.styles.saveButton.backgroundColor} title="Done"
-                                            onPress={() => { console.log(this.state.labels); }} />
-                                    </View>
-                                    <View style={this.styles.wrapButtonView}>
-                                        <Button color={this.styles.cancelButton.backgroundColor} title="Cancel"
-                                            onPress={() => { this.props.navigation.goBack(); }} />
-                                    </View>
-                                </View>
-                            }
+            <FlatList
+                data={labels}
+                keyExtractor={item => item.label.name}
+                contentContainerStyle={this.styles.view}
+                ListHeaderComponent={() => (
+                    <View style={this.styles.inputView}>
+                        <TextInput
+                            style={this.styles.inputForm}
+                            value={this.state.labels.length && this.state.labels[0].editing ?
+                                this.state.labels[0].label.name : ''}
+                            onChangeText={text => {
+                                this.filter(text);
+                            }}
                         />
-                    )
-                }}
-            </DbReadyConsumer>
+                    </View>
+                )}
+                renderItem={({ item }) => (
+                    <TouchableOpacity onPress={() => {
+                        item.editing = false;
+                        item.selected = true;
+                        this.setState({ ...this.state });
+                    }}>
+                        <View>
+                            <Text>{item.label.name}</Text>
+                        </View>
+                    </TouchableOpacity>
+                )}
+                ListFooterComponent={
+                    <View style={this.styles.buttonView}>
+                        <View style={this.styles.wrapButtonView}>
+                            <Button color={this.styles.saveButton.backgroundColor} title="Done"
+                                onPress={() => { console.log(this.state.labels); }} />
+                        </View>
+                        <View style={this.styles.wrapButtonView}>
+                            <Button color={this.styles.cancelButton.backgroundColor} title="Cancel"
+                                onPress={() => { this.props.navigation.goBack(); }} />
+                        </View>
+                    </View>
+                }
+            />
         );
     }
 }
