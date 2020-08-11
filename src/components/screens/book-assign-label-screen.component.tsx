@@ -132,6 +132,16 @@ export class BookAssignLabelScreen extends Component<IBookAssignLabelScreenProps
         this.setState({ ...this.state, labels, query: text });
     }
 
+    private async onItemSelected(item: ILabelSelection) {
+        item.selected = !item.selected;
+        if (item.editing) {
+            item.editing = false;
+            this.filter('');
+        } else {
+            this.setState({ ...this.state });
+        }
+    }
+
     private async onDone() {
         if (this.processing) {
             return;
@@ -186,19 +196,12 @@ export class BookAssignLabelScreen extends Component<IBookAssignLabelScreenProps
                     ItemSeparatorComponent={() => <View style={this.styles.itemSeparator} />}
                     renderItem={({ item }) => (
                         <TouchableOpacity onPress={() => {
-                            item.selected = !item.selected;
-                            if (item.editing) {
-                                item.editing = false;
-                                this.filter('');
-                            } else {
-                                this.setState({ ...this.state });
-                            }
+                            this.onItemSelected(item);
                         }}>
                             <View style={this.styles.itemView}>
                                 <View style={this.styles.itemCheckboxView}>
                                     <CheckBox value={item.selected} onValueChange={(checked: boolean) => {
-                                        item.selected = checked;
-                                        this.setState({ ...this.state });
+                                        this.onItemSelected(item);
                                     }} />
                                 </View>
                                 <View style={this.styles.itemTextView}>
