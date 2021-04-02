@@ -3,8 +3,8 @@ import { Text, Button, StyleSheet, TextInput, View, FlatList, TouchableOpacity, 
 import { Label } from '../../models/label';
 import { LabelService } from '../../services/label-service';
 import CheckBox from '@react-native-community/checkbox';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RouteProp } from '@react-navigation/native';
+import { StackScreenProps } from '@react-navigation/stack';
+import { TBookRouteParamList } from '../common/book-route-param-list';
 
 interface ILabelSelection {
     label: Label;
@@ -14,9 +14,7 @@ interface ILabelSelection {
     displayed: boolean;
 }
 
-interface IBookAssignLabelScreenProps {
-    navigation: StackNavigationProp<any>;
-    route: RouteProp<any, string>;
+interface IBookAssignLabelScreenProps extends StackScreenProps<TBookRouteParamList, 'book.assignlabels'> {
     dbReady: boolean;
 }
 

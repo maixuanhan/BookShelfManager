@@ -8,12 +8,10 @@ import { BookAdditionalInfo } from '../../models/book-additional-info';
 import { Validator } from '../../services/validator';
 import { LabelService } from '../../services/label-service';
 import { Label } from '../../models/label';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RouteProp } from '@react-navigation/core';
+import { StackScreenProps } from '@react-navigation/stack';
+import { TBookRouteParamList } from '../common/book-route-param-list';
 
-interface IBookAddScreenProps {
-    navigation: StackNavigationProp<any>;
-    route: RouteProp<any, string>;
+interface IBookAddScreenProps extends StackScreenProps<TBookRouteParamList, 'book.add'> {
     dbReady: boolean;
 }
 
