@@ -3,9 +3,12 @@ import { Text, FlatList, ListRenderItemInfo, View, StyleSheet, RefreshControl } 
 import { BookService } from '../../services/book-service';
 import { Book } from 'src/models/book';
 import { BookItem } from '../elements/book-item.component';
-import { IStackNavigationProperties } from '../common/stack-navigation-props.interface';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RouteProp } from '@react-navigation/native';
 
-interface IBookListScreenProps extends IStackNavigationProperties {
+interface IBookListScreenProps {
+    navigation: StackNavigationProp<any>;
+    route: RouteProp<any, string>;
     dbReady: boolean;
 }
 

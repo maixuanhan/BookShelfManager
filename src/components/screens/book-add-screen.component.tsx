@@ -6,11 +6,14 @@ import { searchTitle, IBookInfo } from '../../services/goodreads';
 import { AutoCompleteInput } from '../elements/auto-complete-input.component';
 import { BookAdditionalInfo } from '../../models/book-additional-info';
 import { Validator } from '../../services/validator';
-import { IStackNavigationProperties } from '../common/stack-navigation-props.interface';
 import { LabelService } from '../../services/label-service';
 import { Label } from '../../models/label';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RouteProp } from '@react-navigation/core';
 
-interface IBookAddScreenProps extends IStackNavigationProperties {
+interface IBookAddScreenProps {
+    navigation: StackNavigationProp<any>;
+    route: RouteProp<any, string>;
     dbReady: boolean;
 }
 

@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import { Text, Button, StyleSheet, TextInput, View, FlatList, TouchableOpacity, Alert } from 'react-native';
-import { IStackNavigationProperties } from '../common/stack-navigation-props.interface';
 import { Label } from '../../models/label';
 import { LabelService } from '../../services/label-service';
 import CheckBox from '@react-native-community/checkbox';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RouteProp } from '@react-navigation/native';
 
 interface ILabelSelection {
     label: Label;
@@ -13,7 +14,9 @@ interface ILabelSelection {
     displayed: boolean;
 }
 
-interface IBookAssignLabelScreenProps extends IStackNavigationProperties {
+interface IBookAssignLabelScreenProps {
+    navigation: StackNavigationProp<any>;
+    route: RouteProp<any, string>;
     dbReady: boolean;
 }
 
@@ -73,8 +76,8 @@ export class BookAssignLabelScreen extends Component<IBookAssignLabelScreenProps
         },
         itemSeparator: {
             height: 1,
-            width: "100%",
-            backgroundColor: "#ced0ce",
+            width: '100%',
+            backgroundColor: '#ced0ce',
         },
     });
 
@@ -200,7 +203,7 @@ export class BookAssignLabelScreen extends Component<IBookAssignLabelScreenProps
                         }}>
                             <View style={this.styles.itemView}>
                                 <View style={this.styles.itemCheckboxView}>
-                                    <CheckBox value={item.selected} onValueChange={(checked: boolean) => {
+                                    <CheckBox value={item.selected} onValueChange={() => {
                                         this.onItemSelected(item);
                                     }} />
                                 </View>
@@ -213,11 +216,11 @@ export class BookAssignLabelScreen extends Component<IBookAssignLabelScreenProps
                     ListFooterComponent={
                         <View style={this.styles.buttonView}>
                             <View style={this.styles.wrapButtonView}>
-                                <Button color={this.styles.saveButton.backgroundColor} title="Done"
+                                <Button color={this.styles.saveButton.backgroundColor} title='Done'
                                     onPress={() => { this.onDone(); }} />
                             </View>
                             <View style={this.styles.wrapButtonView}>
-                                <Button color={this.styles.cancelButton.backgroundColor} title="Cancel"
+                                <Button color={this.styles.cancelButton.backgroundColor} title='Cancel'
                                     onPress={() => { this.props.navigation.goBack(); }} />
                             </View>
                         </View>
