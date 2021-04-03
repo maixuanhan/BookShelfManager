@@ -20,7 +20,8 @@ export class BookScreen extends Component<IBookScreenProps> {
             marginRight: 10,
         },
     });
-    render() {
+
+    public render() {
         return (
             <DbReadyConsumer>
                 {({ dbReady }) => (

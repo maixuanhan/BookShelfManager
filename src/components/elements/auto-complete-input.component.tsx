@@ -63,13 +63,13 @@ export class AutoCompleteInput<T> extends Component<IAutoCompleteInputProps<T>, 
         if (this.props.onItemSelected) { this.props.onItemSelected(item); }
     }
 
-    componentDidUpdate(prevProps: Readonly<IAutoCompleteInputProps<T>>) {
+    public componentDidUpdate(prevProps: Readonly<IAutoCompleteInputProps<T>>) {
         if (prevProps.data != this.props.data) {
             this.setState({ ...this.state, data: this.props.data });
         }
     }
 
-    render() {
+    public render() {
         return (
             <FlatList
                 style={this.styles.container}

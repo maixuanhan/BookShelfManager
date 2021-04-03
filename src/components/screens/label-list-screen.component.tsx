@@ -1,25 +1,25 @@
 import React, { Component } from 'react';
 import { Text, FlatList, ListRenderItemInfo, View, StyleSheet, RefreshControl } from 'react-native';
-import { BookService } from '../../services/book-service';
-import { Book } from 'src/models/book';
-import { BookItem } from '../elements/book-item.component';
 import { StackScreenProps } from '@react-navigation/stack';
 import { TRoutingParamList } from '../common/routing-param-list';
+import { Label } from '../../models/label';
+import { LabelService } from '../../services/label-service';
+import { LabelItem } from '../elements/label-item.component';
 
-interface IBookListScreenProps extends StackScreenProps<TRoutingParamList, 'book.list'> {
+interface ILabelListScreenProps extends StackScreenProps<TRoutingParamList, 'label.list'> {
     dbReady: boolean;
 }
 
-interface IBookListScreenState {
-    books: Book[];
+interface ILabelListScreenState {
+    labels: Label[];
     loading: boolean;
 }
 
-export class BookListScreen extends Component<IBookListScreenProps, IBookListScreenState> {
-    constructor(props: IBookListScreenProps) {
+export class LabelListScreen extends Component<ILabelListScreenProps, ILabelListScreenState> {
+    constructor(props: ILabelListScreenProps) {
         super(props);
         this.state = {
-            books: [],
+            labels: [],
             loading: false,
         };
     }
@@ -35,37 +35,37 @@ export class BookListScreen extends Component<IBookListScreenProps, IBookListScr
         },
     });
 
-    private bookService = new BookService();
+    private labelService = new LabelService();
 
-    private async tryLoadBooks() {
+    private async tryLoadLabels() {
         if (this.props.dbReady) {
-            console.log('try load books...');
-            let books: Book[] = this.state.books;
+            console.log('try load labels...');
+            let labels = this.state.labels;
             this.setState({ ...this.state, loading: true });
             try {
-                const [bs, count] = await this.bookService.getBooks(0, 500);
-                books = bs;
+                const [lbs, count] = await this.labelService.getLabels(0, 500);
+                labels = lbs;
                 console.log('Total count:', count);
-            } catch (e) {
-                console.log('Error happens while fetching books.', e);
+            } catch (ex) {
+                console.log('Error happens while fetching labels.', ex);
             }
-            this.setState({ ...this.state, books, loading: false });
+            this.setState({ ...this.state, labels, loading: false });
         }
     }
 
     public componentDidMount() {
         console.log('componentDidMount event');
-        this.tryLoadBooks();
+        this.tryLoadLabels();
     }
 
-    public componentDidUpdate(prevProps: IBookListScreenProps) {
-        console.log('componentDidUpdate event:', this.props.route?.params?.new?.id);
+    public componentDidUpdate(prevProps: ILabelListScreenProps) {
+        // console.log('componentDidUpdate event:', this.props.route?.params?.new?.id);
         if (this.props.dbReady !== prevProps.dbReady && this.props.dbReady) {
-            this.tryLoadBooks();
+            this.tryLoadLabels();
         }
         if (this.props.route?.params?.new?.id !== prevProps.route?.params?.new?.id) {
             if (this.props.route?.params?.new?.id) {
-                this.state.books.unshift(this.props.route.params.new as Book);
+                this.state.labels.unshift(this.props.route.params.new as Label);
                 this.setState({ ...this.state });
             }
         }
@@ -78,25 +78,25 @@ export class BookListScreen extends Component<IBookListScreenProps, IBookListScr
                 ListEmptyComponent={
                     <View style={this.styles.centeredContainer}>
                         {this.state.loading ?
-                            <Text>Loading books...</Text> :
-                            <Text>There is no book</Text>
+                            <Text>Loading labels...</Text> :
+                            <Text>There is no label</Text>
                         }
                     </View>
                 }
-                data={this.state.books}
-                renderItem={(info: ListRenderItemInfo<Book>) =>
-                    <BookItem book={info.item} onDeleted={async (book: Book) => {
-                        if (book.id) {
-                            this.bookService.deleteBook(book.id);
-                            const books = this.state.books.filter(b => b.id !== book.id);
-                            this.setState({ ...this.state, books });
+                data={this.state.labels}
+                renderItem={(info: ListRenderItemInfo<Label>) =>
+                    <LabelItem label={info.item} onDeleted={async (label: Label) => {
+                        if (label.id) {
+                            await this.labelService.deleteLabel(label.id);
+                            const labels = this.state.labels.filter(r => r.id !== label.id);
+                            this.setState({ ...this.state, labels });
                         }
                     }} />}
                 keyExtractor={item => item.id?.toString() || 'never'}
                 refreshControl={<RefreshControl
                     colors={['#9Bd35A', '#689F38']}
                     refreshing={this.state.loading}
-                    onRefresh={() => { this.tryLoadBooks(); }} />}
+                    onRefresh={() => { this.tryLoadLabels(); }} />}
             />
         );
     }

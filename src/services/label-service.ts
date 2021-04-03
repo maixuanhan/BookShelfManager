@@ -1,8 +1,12 @@
+import { DeleteResult } from 'typeorm/browser';
 import { Label } from '../models/label';
 
 export class LabelService {
     public getLabels(skip: number, take: number): Promise<[Label[], number]> {
-        return Label.findAndCount({ relations: ['books'], skip, take });
+        return Label.findAndCount({
+            order: { createdDate: 'DESC' },
+            relations: ['books'], skip, take,
+        });
     }
 
     public getLabelsByIds(ids: number[]): Promise<Label[]> {
@@ -19,6 +23,12 @@ export class LabelService {
     }
 
     public getAllLabels(): Promise<Label[]> {
-        return Label.find({});
+        return Label.find({
+            order: { name: 'ASC' },
+        });
+    }
+
+    public deleteLabel(id: number): Promise<DeleteResult> {
+        return Label.delete(id);
     }
 }

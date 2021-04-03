@@ -1,8 +1,10 @@
-import { Book } from 'src/models/book';
+import { Book } from '../../models/book';
+import { Label } from '../../models/label';
 
 export type TRoutingParamList = {
     'menu.home': undefined;
     'menu.books': undefined;
+    'menu.labels': undefined;
     'book.list'?: { // ? means params are optional
         new: Partial<Book>;
     };
@@ -13,4 +15,8 @@ export type TRoutingParamList = {
         ids: number[];
         news?: string[];
     };
+    'label.list'?: {
+        new: Partial<Label>;
+    };
+    'label.add': undefined;
 };

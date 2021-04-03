@@ -7,6 +7,7 @@ import {
 import { NavigationContainer } from '@react-navigation/native';
 import { BookScreen } from './screens/book-screen.component';
 import { DbReadyConsumer } from './elements/db-ready.context.component';
+import { LabelScreen } from './screens/label-screen.component';
 
 const Drawer = createDrawerNavigator();
 
@@ -14,8 +15,9 @@ const HomeScreen = () => {
     return (<Text>Should show some random book or book of the day</Text>);
 };
 
-const screenList: Array<{ id: string, title: string, component: any }> = [
+const screenList: Array<{ id: string, title: string, component: React.ComponentType<any> }> = [
     { id: 'menu.home', title: 'Home', component: HomeScreen },
+    { id: 'menu.labels', title: 'Labels', component: LabelScreen },
     { id: 'menu.books', title: 'Books', component: BookScreen },
 ];
 
@@ -38,6 +40,7 @@ export class MainMenu extends Component<IMainMenuProperties> {
             console.error('TODO: handle db init error', ex);
         }
     }
+
     public render() {
         return (
             <DbReadyConsumer>
@@ -47,11 +50,17 @@ export class MainMenu extends Component<IMainMenuProperties> {
                     }
                     return (
                         <NavigationContainer>
-                            <Drawer.Navigator initialRouteName="menu.books" drawerContent={CustomDrawerContent}>
+                            <Drawer.Navigator
+                                initialRouteName="menu.books"
+                                drawerContent={CustomDrawerContent}
+                            >
+
                                 {screenList.map(item =>
                                     <Drawer.Screen key={item.id} name={item.id} component={item.component} options={{
                                         drawerLabel: item.title,
-                                    }} />)}
+                                    }} />,
+                                )}
+
                             </Drawer.Navigator>
                         </NavigationContainer>
                     );
