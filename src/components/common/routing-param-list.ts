@@ -1,10 +1,12 @@
 import { Book } from 'src/models/book';
 
-export type TBookRouteParamList = {
+export type TRoutingParamList = {
+    'menu.home': undefined;
+    'menu.books': undefined;
     'book.list'?: { // ? means params are optional
         new: Partial<Book>;
     };
-    'book.add': {
+    'book.add'?: {
         ids: number[];
     };
     'book.assignlabels': {

@@ -4,9 +4,9 @@ import { BookService } from '../../services/book-service';
 import { Book } from 'src/models/book';
 import { BookItem } from '../elements/book-item.component';
 import { StackScreenProps } from '@react-navigation/stack';
-import { TBookRouteParamList } from '../common/book-route-param-list';
+import { TRoutingParamList } from '../common/routing-param-list';
 
-interface IBookListScreenProps extends StackScreenProps<TBookRouteParamList, 'book.list'> {
+interface IBookListScreenProps extends StackScreenProps<TRoutingParamList, 'book.list'> {
     dbReady: boolean;
 }
 

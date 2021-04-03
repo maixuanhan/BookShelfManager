@@ -5,14 +5,13 @@ import { BookAddScreen } from './book-add-screen.component';
 import { Button, StyleSheet, View } from 'react-native';
 import { DbReadyConsumer } from '../elements/db-ready.context.component';
 import { BookAssignLabelScreen } from './book-assign-label-screen.component';
-import { DrawerNavigationProp } from '@react-navigation/drawer';
-import { RouteProp } from '@react-navigation/core';
+import { DrawerScreenProps } from '@react-navigation/drawer';
+import { TRoutingParamList } from '../common/routing-param-list';
 
 const Stack = createStackNavigator();
 
-interface IBookScreenProps {
-    navigation: DrawerNavigationProp<any>;
-    route: RouteProp<any, string>;
+interface IBookScreenProps extends DrawerScreenProps<TRoutingParamList, 'menu.books'> {
+    dbReady: boolean;
 }
 
 export class BookScreen extends Component<IBookScreenProps> {

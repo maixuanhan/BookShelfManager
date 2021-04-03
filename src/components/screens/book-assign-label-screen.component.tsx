@@ -4,7 +4,7 @@ import { Label } from '../../models/label';
 import { LabelService } from '../../services/label-service';
 import CheckBox from '@react-native-community/checkbox';
 import { StackScreenProps } from '@react-navigation/stack';
-import { TBookRouteParamList } from '../common/book-route-param-list';
+import { TRoutingParamList } from '../common/routing-param-list';
 
 interface ILabelSelection {
     label: Label;
@@ -14,7 +14,7 @@ interface ILabelSelection {
     displayed: boolean;
 }
 
-interface IBookAssignLabelScreenProps extends StackScreenProps<TBookRouteParamList, 'book.assignlabels'> {
+interface IBookAssignLabelScreenProps extends StackScreenProps<TRoutingParamList, 'book.assignlabels'> {
     dbReady: boolean;
 }
 

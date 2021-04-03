@@ -9,9 +9,9 @@ import { Validator } from '../../services/validator';
 import { LabelService } from '../../services/label-service';
 import { Label } from '../../models/label';
 import { StackScreenProps } from '@react-navigation/stack';
-import { TBookRouteParamList } from '../common/book-route-param-list';
+import { TRoutingParamList } from '../common/routing-param-list';
 
-interface IBookAddScreenProps extends StackScreenProps<TBookRouteParamList, 'book.add'> {
+interface IBookAddScreenProps extends StackScreenProps<TRoutingParamList, 'book.add'> {
     dbReady: boolean;
 }
 
