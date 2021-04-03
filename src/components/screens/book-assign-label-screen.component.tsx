@@ -5,6 +5,7 @@ import { LabelService } from '../../services/label-service';
 import CheckBox from '@react-native-community/checkbox';
 import { StackScreenProps } from '@react-navigation/stack';
 import { TRoutingParamList } from '../common/routing-param-list';
+import { LabelBuilder } from '../../services/label-builder';
 
 interface ILabelSelection {
     label: Label;
@@ -102,7 +103,7 @@ export class BookAssignLabelScreen extends Component<IBookAssignLabelScreenProps
                 label.selected = true;
             } else {
                 labels.push({
-                    label: new Label(undefined, name),
+                    label: new LabelBuilder().makeNewLabel(name).get(),
                     isNew: true,
                     selected: true,
                     editing: false,
@@ -121,7 +122,7 @@ export class BookAssignLabelScreen extends Component<IBookAssignLabelScreenProps
             const matched = labels.find(r => r.label.name === text);
             if (!matched) {
                 labels.unshift({
-                    label: new Label(undefined, text),
+                    label: new LabelBuilder().makeNewLabel(text).get(),
                     editing: true,
                     isNew: true,
                     selected: false,

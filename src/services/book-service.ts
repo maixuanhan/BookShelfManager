@@ -1,5 +1,4 @@
 import { Book } from '../models/book';
-import { Label } from '../models/label';
 import { DeleteResult } from 'typeorm/browser';
 
 export class BookService {
@@ -12,15 +11,7 @@ export class BookService {
         });
     }
 
-    public addBook(info: Partial<Book>, labels?: Label[]): Promise<Book> {
-        const book = new Book(undefined, info.title, info.authors, info.quantity, info.note, info.remark);
-        if (labels) {
-            book.labels = labels;
-        }
-        return book.save();
-    }
-
-    public updateBook(book: Book): Promise<Book> {
+    public addOrUpdateBook(book: Book): Promise<Book> {
         return book.save()
     }
 

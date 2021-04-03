@@ -10,6 +10,7 @@ import { LabelService } from '../../services/label-service';
 import { Label } from '../../models/label';
 import { StackScreenProps } from '@react-navigation/stack';
 import { TRoutingParamList } from '../common/routing-param-list';
+import { BookBuilder } from '../../services/book-builder';
 
 interface IBookAddScreenProps extends StackScreenProps<TRoutingParamList, 'book.add'> {
     dbReady: boolean;
@@ -112,23 +113,30 @@ export class BookAddScreen extends Component<IBookAddScreenProps, IBookAddScreen
                         failMessage: 'You must own at least 1 book',
                     },
                 ]).validate();
+
                 if (!validationResult.ok) {
                     throw new Error(validationResult.message);
                 }
-                const book: Partial<Book> = {
-                    title: this.state.title || '',
-                    authors: this.state.authors || '',
-                    quantity: this.state.quantity || 0,
-                    note: this.state.note,
-                    remark: JSON.stringify(this.state.additionalInfo),
-                };
-                const result = await this.bookService.addBook(book, this.state.labels);
-                book.id = result.id; // to fix junk members from typeorm
-                this.props.navigation.navigate('book.list', { new: book });
-            } catch (e) {
+
+                const book = new BookBuilder().makeNewBook(
+                    this.state.title || '',
+                    this.state.authors,
+                    this.state.quantity,
+                    this.state.note,
+                    JSON.stringify(this.state.additionalInfo),
+                ).setLabels(this.state.labels).get();
+                const result = await this.bookService.addOrUpdateBook(book);
+                this.props.navigation.navigate('book.list', {
+                    new: {
+                        id: result.id, authors: result.authors, title: result.title, quantity: result.quantity,
+                        note: result.note, remark: result.remark,
+                    },
+                });
+            } catch (ex) {
+                console.error('Error while adding book:', ex);
+                Alert.alert(`Cannot add book: ${ex.message}`);
+            } finally {
                 this.updating = false;
-                // console.log("Error while adding book:", e);
-                Alert.alert(`Cannot add book: ${e.message}`);
             }
         } else if (this.updating) {
             console.log('Book is updating');

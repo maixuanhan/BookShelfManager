@@ -1,5 +1,6 @@
 import { DeleteResult } from 'typeorm/browser';
 import { Label } from '../models/label';
+import { LabelBuilder } from './label-builder';
 
 export class LabelService {
     public getLabels(skip: number, take: number): Promise<[Label[], number]> {
@@ -14,8 +15,7 @@ export class LabelService {
     }
 
     public addLabel(name: string, description?: string): Promise<Label> {
-        const label = new Label(undefined, name, description);
-        return label.save();
+        return new LabelBuilder().makeNewLabel(name, description).get().save();
     }
 
     public updateLabel(label: Label): Promise<Label> {
