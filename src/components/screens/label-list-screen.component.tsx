@@ -59,7 +59,6 @@ export class LabelListScreen extends Component<ILabelListScreenProps, ILabelList
     }
 
     public componentDidUpdate(prevProps: ILabelListScreenProps) {
-        // console.log('componentDidUpdate event:', this.props.route?.params?.new?.id);
         if (this.props.dbReady !== prevProps.dbReady && this.props.dbReady) {
             this.tryLoadLabels();
         }

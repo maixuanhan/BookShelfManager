@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Database } from '../database';
-import { Text } from 'react-native';
+import { Text, View } from 'react-native';
 import {
     createDrawerNavigator, DrawerContentComponentProps, DrawerContentScrollView, DrawerItemList,
 } from '@react-navigation/drawer';
@@ -8,6 +8,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { BookScreen } from './screens/book-screen.component';
 import { DbReadyConsumer } from './elements/db-ready.context.component';
 import { LabelScreen } from './screens/label-screen.component';
+import { MainMenuDetail } from './main-menu-detail.component';
 
 const Drawer = createDrawerNavigator();
 
@@ -20,12 +21,6 @@ const screenList: Array<{ id: string, title: string, component: React.ComponentT
     { id: 'menu.labels', title: 'Labels', component: LabelScreen },
     { id: 'menu.books', title: 'Books', component: BookScreen },
 ];
-
-const CustomDrawerContent = (props: DrawerContentComponentProps) => (
-    <DrawerContentScrollView {...props}>
-        <DrawerItemList {...props} />
-    </DrawerContentScrollView>
-);
 
 interface IMainMenuProperties {
 }
@@ -52,7 +47,7 @@ export class MainMenu extends Component<IMainMenuProperties> {
                         <NavigationContainer>
                             <Drawer.Navigator
                                 initialRouteName="menu.books"
-                                drawerContent={CustomDrawerContent}
+                                drawerContent={(props) => <MainMenuDetail {...props} />}
                             >
 
                                 {screenList.map(item =>
