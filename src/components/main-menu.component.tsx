@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import { Database } from '../database';
-import { Text, View } from 'react-native';
-import {
-    createDrawerNavigator, DrawerContentComponentProps, DrawerContentScrollView, DrawerItemList,
-} from '@react-navigation/drawer';
+import { Text } from 'react-native';
+import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
 import { BookScreen } from './screens/book-screen.component';
 import { DbReadyConsumer } from './elements/db-ready.context.component';
